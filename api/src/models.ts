@@ -11,6 +11,7 @@ export interface Version extends MongooseDocument {
 	content: string;
 	prompt: string;
 	created_at: Date;
+	level: number;
 }
 
 export interface IDocument extends MongooseDocument {
@@ -20,41 +21,38 @@ export interface IDocument extends MongooseDocument {
 	title: string;
 }
 
-const VersionModel = new mongoose.Schema<Version>(
-	{
-		_id: {
-			type: Number,
-			required: true,
-			unique: true,
-		},
-		title: {
-			type: String,
-			required: true,
-		},
-		content: {
-			type: String,
-			required: true,
-		},
-		prompt: {
-			type: String,
-			required: true,
-		},
-		created_at: {
-			type: Date,
-			required: true,
-		},
+const VersionModel = new mongoose.Schema<Version>({
+	title: {
+		type: String,
+		required: true,
 	},
-	{ _id: false }
-);
-
-const DocumentModel = new mongoose.Schema<IDocument>({
-	_id: {
+	content: {
+		type: String,
+		required: true,
+	},
+	prompt: {
+		type: String,
+		required: true,
+	},
+	created_at: {
+		type: Date,
+		required: true,
+	},
+	level: {
 		type: Number,
 		required: true,
-		unique: true,
 	},
+});
+
+const DocumentModel = new mongoose.Schema<IDocument>({
 	versions: {
-		type: [VersionModel],
+		// reference to version document
+		type: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Version",
+			},
+		],
 		default: [],
 	},
 	versions_count: {
@@ -74,7 +72,12 @@ const UserModel = new mongoose.Schema<IUser>({
 		unique: true,
 	},
 	documents: {
-		type: [DocumentModel],
+		type: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Document",
+			},
+		],
 		default: [],
 	},
 });
