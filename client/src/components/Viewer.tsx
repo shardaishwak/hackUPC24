@@ -31,8 +31,6 @@ const Viewer: React.FC<Props> = (props) => {
 		})();
 	}, [versionId]);
 
-	console.log(versionUrl);
-
 	return (
 		<Container>
 			{versionUrl}
