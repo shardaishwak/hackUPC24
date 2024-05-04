@@ -3,8 +3,12 @@
   "locale": {
     "source": "en",
     "targets": [
-      "es"
+      "es",
+      "ca",
+      "fr"
     ]
   },
-  "buckets": {}
+  "buckets": {
+    "i18n/translations/[locale].json": "json"
+  }
 }

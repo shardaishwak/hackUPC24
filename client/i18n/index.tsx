@@ -25,10 +25,13 @@ export const useLanguage = (props: string | Array<string>) => {
 
 	switch (lang) {
 		case "en":
-			data = require("../i18n/en.json");
+			data = require("../i18n/translations/en.json");
 			break;
 		case "it":
-			data = require("../i18n/it.json");
+			data = require("../i18n/translations/it.json");
+			break;
+		case "es":
+			data = require("../i18n/translations/es.json");
 			break;
 		default:
 			data = require("../i18n/en.json");
