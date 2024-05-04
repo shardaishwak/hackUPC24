@@ -9,7 +9,7 @@ export interface Document {
 }
 
 export interface Version {
-	_id: number;
+	_id: string;
 	title: string;
 	content: string;
 	prompt: string;
@@ -23,17 +23,15 @@ export interface User {
 	documents: Document;
 }
 interface DocumentState {
-	[key: string]: {
-		_id: string;
-		title: string;
-		versions: Version[];
+	documents: {
+		[key: string]: Document;
 	};
 }
 
 export const documentState = atom<DocumentState>({
 	key: "documentState",
 	// hashmap of documents
-	default: {},
+	default: { documents: {} },
 });
 
 interface VersionState {
@@ -56,7 +54,7 @@ export const versionState = atom<VersionState>({
 interface UserState {
 	_id: string;
 	uid: string;
-	documents: string[];
+	documents: Document[];
 }
 
 export const userState = atom<UserState>({
@@ -72,5 +70,6 @@ export const generalState = atom({
 	key: "generalState",
 	default: {
 		locale: "en",
+		message: "",
 	},
 });

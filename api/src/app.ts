@@ -2,9 +2,10 @@ import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import OpenAI from "openai";
 import helmet from "helmet";
+import cors from "cors";
 import BodyParser from "body-parser";
 import ErrorWithStatus from "./ErrorWithStatus";
-import { Document, IDocument, User, Version } from "./models";
+import { Document, Document as IDocument, User, Version } from "./models";
 
 // load env
 
@@ -14,6 +15,12 @@ const app = express();
 
 app.use(helmet());
 app.use(BodyParser.json());
+
+app.use(
+	cors({
+		origin: process.env.CLIENT_URL,
+	})
+);
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_KEY, // This is the default and can be omitted
@@ -33,7 +40,7 @@ app.post("/user", async (req: Request, res: Response, next: NextFunction) => {
 
 app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { prompt, engine = "2D", uid, documentID } = req.body;
+		let { prompt, engine = "2D", uid, documentID } = req.body;
 		if (!prompt) {
 			throw new ErrorWithStatus("Prompt is required", 400);
 		}
@@ -56,13 +63,17 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 			if (!document) {
 				document = await Document.create({
 					title: prompt,
+					type: engine,
 				});
 				user.documents.push(document.id);
 				await user.save();
+			} else {
+				engine = document.type;
 			}
 		} else {
 			document = await Document.create({
 				title: prompt,
+				type: engine,
 			});
 			user.documents.push(document.id);
 			await user.save();
@@ -87,19 +98,30 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
             You need to follow the best practices and make sure that the code is clean and well-organized.
             You only return the code that is executable in the browser in one single file.
             Your output should be in the following JSON format:
-            only html code
-            If the user asks something inappropriate or out of context, do not return anything.
+            only html code with embedded css and js
+            If the user asks something inappropriate, return format ERROR_444-{message}
+			If you just want to say something, return format MESSAGE-{message}
             do not write anything. Just give code. No JSON, just HTML code.
 
             your code needs to be complete. Try to give it as many features as possible.
+
+			The user can make the application as complex as they want.
+			
         `;
 
 		const messages = [{ role: "system", content: setup_prompt }];
 		// load previous version history and genreate a new version
-		document.versions.forEach((version) => {
-			messages.push({ role: "user", content: version.prompt });
-			messages.push({ role: "assistant", content: version.content });
-		});
+		// document.versions.forEach((version) => {
+		// 	messages.push({ role: "user", content: version.prompt });
+		// 	messages.push({ role: "assistant", content: version.content });
+		// });
+
+		//load the last version
+		if (document.versions.length > 0) {
+			const lastVersion = document.versions[document.versions.length - 1];
+			messages.push({ role: "user", content: lastVersion.prompt });
+			messages.push({ role: "assistant", content: lastVersion.content });
+		}
 
 		messages.push({ role: "user", content: prompt });
 
@@ -117,7 +139,19 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 			throw new ErrorWithStatus("No response from the model", 500);
 		}
 
-		const result = chatCompletion.choices[0].message.content.replace("```", "");
+		const result = chatCompletion.choices[0].message.content
+			.replace("html ```", "")
+			.replace("```", "");
+
+		if (result.includes("ERROR_444")) {
+			throw new ErrorWithStatus(result.split("ERROR_444-")?.[1], 400);
+		}
+		if (result.includes("MESSAGE-")) {
+			res.status(202).send({
+				message: result.split("MESSAGE-")?.[1],
+			});
+			return;
+		}
 
 		// create a new document version
 		const version = await Version.create({
@@ -127,11 +161,15 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 			prompt: prompt,
 			created_at: new Date(),
 		});
-		document.versions.push(version);
+		document.versions.push(version.id);
 		document.versions_count += 1;
+		document.updated_at = new Date();
 		await document.save();
 
-		res.send(document);
+		res.send({
+			document,
+			version,
+		});
 	} catch (err) {
 		next(err);
 	}
@@ -142,9 +180,19 @@ app.get(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { uid } = req.params;
+			// lol poor server
 			const user = await User.findOne({ uid }).populate("documents");
+
+			// user?.documents.forEach(doc  => {
+			// 	doc.versions = doc.versions.map(async version => await Version.findById(version))
+			// })
 			if (!user) {
-				throw new ErrorWithStatus("User not found", 404);
+				// create a new user if not existing yet
+				const user = await User.create({
+					uid,
+				});
+				res.send(user);
+				return;
 			}
 			res.send(user);
 		} catch (err) {

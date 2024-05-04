@@ -5,10 +5,11 @@
     "targets": [
       "es",
       "ca",
-      "fr"
+      "fr",
+      "shyriiwook"
     ]
   },
   "buckets": {
-    "i18n/translations/[locale].json": "json"
+    "src/i18n/translations/[locale].json": "json"
   }
 }

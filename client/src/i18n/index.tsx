@@ -25,16 +25,22 @@ export const useLanguage = (props: string | Array<string>) => {
 
 	switch (lang) {
 		case "en":
-			data = require("../i18n/translations/en.json");
+			data = require("./translations/en.json");
 			break;
-		case "it":
-			data = require("../i18n/translations/it.json");
+		case "ca":
+			data = require("./translations/ca.json");
 			break;
 		case "es":
-			data = require("../i18n/translations/es.json");
+			data = require("./translations/es.json");
+			break;
+		case "fr":
+			data = require("./translations/fr.json");
+			break;
+		case "shyriiwook":
+			data = require("./translations/shyriiwook.json");
 			break;
 		default:
-			data = require("../i18n/en.json");
+			data = require("./translations/en.json");
 	}
 	if (Array.isArray(props)) {
 		const cache = {};
