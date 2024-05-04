@@ -12,13 +12,19 @@ import { heading5, heading6 } from "../../typography";
 const inter = Inter({ subsets: ["latin"] });
 
 export const Auth = (props) => {
-	const { user, isAuthenticated, isLoading } = useAuth0();
+	const { user, isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
 	const setUser = useSetRecoilState(userState);
 
 	const setDocuments = useSetRecoilState(documentState);
 	const documents = useRecoilValue(documentState);
 
 	console.log(documents);
+
+	React.useEffect(() => {
+		if (!isAuthenticated && !isLoading) {
+			loginWithRedirect();
+		}
+	}, [isAuthenticated, isLoading, loginWithRedirect]);
 
 	React.useEffect(() => {
 		(async () => {
