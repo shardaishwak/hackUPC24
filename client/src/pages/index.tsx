@@ -7,6 +7,7 @@ import Prompts from "@/components/prompts";
 import Input from "@/components/input";
 import styled from "styled-components";
 import Output from "@/components/output";
+import Viewer from "@/components/Viewer";
 
 const inter = Inter({ subsets: ["latin"] });
 
