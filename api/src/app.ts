@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import helmet from "helmet";
 import BodyParser from "body-parser";
 import ErrorWithStatus from "./ErrorWithStatus";
+import { Document, IDocument, User, Version } from "./models";
 
 // load env
 
@@ -18,11 +19,48 @@ const openai = new OpenAI({
 	apiKey: process.env.OPENAI_KEY, // This is the default and can be omitted
 });
 
+app.post("/user", async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const user = await User.create({
+			uid: Math.floor(Math.random() * 1000000),
+		});
+		res.send(user);
+	} catch (err) {
+		next(err);
+	}
+});
+
 app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { prompt, engine = "2D" } = req.body;
+		const { prompt, engine = "2D", uid, documentID } = req.body;
 		if (!prompt) {
 			throw new ErrorWithStatus("Prompt is required", 400);
+		}
+
+		if (!uid) {
+			throw new ErrorWithStatus("uid is required", 400);
+		}
+
+		const user = await User.findOne({ uid });
+		if (!user) {
+			throw new ErrorWithStatus("User not found", 404);
+		}
+
+		let document: IDocument;
+		if (documentID) {
+			document = (await Document.findById(documentID)) as IDocument;
+			// create a new document if the document is not found
+			if (!document) {
+				document = await Document.create({
+					title: prompt,
+				});
+				user.documents.push(document.id);
+			}
+		} else {
+			document = await Document.create({
+				title: prompt,
+			});
+			user.documents.push(document.id);
 		}
 
 		const engine_prompt = `
@@ -68,11 +106,72 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 		}
 
 		const result = chatCompletion.choices[0].message.content.replace("```", "");
-		res.send(result);
+
+		// create a new document version
+		const version = await Version.create({
+			_id: document.versions_count + 1,
+			title: prompt,
+			content: result,
+			prompt: prompt,
+			created_at: new Date(),
+		});
+		document.versions.push(version);
+		document.versions_count += 1;
+		await document.save();
+
+		res.send(document);
 	} catch (err) {
 		next(err);
 	}
 });
+
+app.get(
+	"/user/:uid",
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { uid } = req.params;
+			const user = await User.findOne({ uid }).populate("documents");
+			if (!user) {
+				throw new ErrorWithStatus("User not found", 404);
+			}
+			res.send(user);
+		} catch (err) {
+			next(err);
+		}
+	}
+);
+
+app.get(
+	"/document/:id",
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { id } = req.params;
+			const document = await Document.findById(id).populate("versions");
+			if (!document) {
+				throw new ErrorWithStatus("Document not found", 404);
+			}
+			res.send(document);
+		} catch (err) {
+			next(err);
+		}
+	}
+);
+
+app.delete(
+	"/document/:id",
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { id } = req.params;
+			const document = await Document.findByIdAndDelete(id);
+			if (!document) {
+				throw new ErrorWithStatus("Document not found", 404);
+			}
+			res.send(document);
+		} catch (err) {
+			next(err);
+		}
+	}
+);
 
 /**
  * Any error that occurs in the application will be caught here
