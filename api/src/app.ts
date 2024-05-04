@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import OpenAI from "openai";
 import helmet from "helmet";
+import cors from "cors";
 import BodyParser from "body-parser";
 import ErrorWithStatus from "./ErrorWithStatus";
 import { Document, IDocument, User, Version } from "./models";
@@ -14,6 +15,12 @@ const app = express();
 
 app.use(helmet());
 app.use(BodyParser.json());
+
+app.use(
+	cors({
+		origin: process.env.CLIENT_URL,
+	})
+);
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_KEY, // This is the default and can be omitted

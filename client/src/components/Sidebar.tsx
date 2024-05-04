@@ -1,8 +1,5 @@
 import styled from "styled-components";
 import {
-	bodyDesktop1,
-	bodyDesktop2,
-	bodyDesktop3,
 	bodyMobileTablet1,
 	bodyMobileTablet2,
 	bodyMobileTablet3,

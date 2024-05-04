@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import Sidebar from "@/components/Sidebar";
+import Viewer from "@/components/Viewer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +18,7 @@ export default function Home() {
 			</Head>
 			<main className={`${inter.className}`}>
 				<Sidebar />
+				<Viewer versionId="66361c564dbf66b65130c9e3" />
 			</main>
 		</>
 	);
