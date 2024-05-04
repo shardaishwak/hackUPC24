@@ -75,6 +75,21 @@ const Sidebar = (props) => {
 			<div>
 				<Title>Framer Ai</Title>
 				{/** Add button */}
+				<Link href={"/"} style={{ textDecoration: "none" }}>
+					<CustomLink
+						style={{
+							marginLeft: 16,
+							marginRight: 16,
+							borderRadius: 16,
+							background: colors.blue200,
+							marginBottom: 24,
+							fontWeight: 600,
+						}}
+						active={false}
+					>
+						Create a new document
+					</CustomLink>
+				</Link>
 
 				<Lister>
 					{documents.today.length > 0 && (
