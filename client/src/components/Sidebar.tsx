@@ -83,7 +83,7 @@ const Sidebar = (props) => {
 	return (
 		<Container>
 			<div>
-				<Title>Framer Ai</Title>
+				<Title>Framer AI</Title>
 				{/** Add button */}
 				<Link href={"/"} style={{ textDecoration: "none" }}>
 					<CustomLink

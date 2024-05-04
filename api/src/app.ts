@@ -40,7 +40,7 @@ app.post("/user", async (req: Request, res: Response, next: NextFunction) => {
 
 app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { prompt, engine = "2D", uid, documentID } = req.body;
+		let { prompt, engine = "2D", uid, documentID } = req.body;
 		if (!prompt) {
 			throw new ErrorWithStatus("Prompt is required", 400);
 		}
@@ -63,13 +63,17 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 			if (!document) {
 				document = await Document.create({
 					title: prompt,
+					type: engine,
 				});
 				user.documents.push(document.id);
 				await user.save();
+			} else {
+				engine = document.type;
 			}
 		} else {
 			document = await Document.create({
 				title: prompt,
+				type: engine,
 			});
 			user.documents.push(document.id);
 			await user.save();

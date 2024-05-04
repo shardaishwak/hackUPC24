@@ -7,7 +7,9 @@ import React from "react";
 import Editor from "@/Editor";
 import { useLanguage } from "@/i18n";
 
-const Output: React.FC<{ version_id: string; code: string }> = (props) => {
+const Output: React.FC<{ version_id: string; code: string; type: string }> = (
+	props
+) => {
 	const [showCode, setShowCode] = React.useState(false);
 	const text: any = useLanguage(["view_code"]);
 
@@ -15,9 +17,9 @@ const Output: React.FC<{ version_id: string; code: string }> = (props) => {
 		<Container>
 			<TopButtons>
 				<ViewButtons>
-					<TwoButton>2D</TwoButton>
+					<TwoButton active={props.type === "2D"}>2D</TwoButton>
 
-					<ThreeButton>3D</ThreeButton>
+					<ThreeButton active={props.type === "3D"}>3D</ThreeButton>
 				</ViewButtons>
 
 				<ViewCode onClick={() => setShowCode(!showCode)}>
@@ -45,6 +47,10 @@ const Container = styled.div`
 	justify-content: space-between;
 	align-items: center;
 	height: 100vh;
+	padding-left: 8px;
+	box-sizing: border-box;
+	border-top-left-radius: 16px;
+	border-bottom-left-radius: 16px;
 `;
 
 const TopButtons = styled.div`
@@ -54,6 +60,7 @@ const TopButtons = styled.div`
 	align-items: center;
 	width: 100%;
 	height: 5%;
+	padding: 8px 0;
 `;
 
 const ViewButtons = styled.div`
@@ -63,7 +70,7 @@ const ViewButtons = styled.div`
 	align-items: center;
 `;
 
-const ViewCode = styled.button`
+const ViewCode = styled.button<{ active?: boolean }>`
 	margin-right: 16px;
 	padding: 6px 12px;
 	${bodyMobileTablet1}
@@ -72,14 +79,21 @@ const ViewCode = styled.button`
 	border: none;
 	cursor: pointer;
 
-	&:hover {
-		background-color: ${colors.blue300};
-	}
+	${(props) =>
+		props.active &&
+		`
+		background-color: ${colors.black};
+		color: white;
+	`}
 `;
 
-const TwoButton = styled(ViewCode)``;
+const TwoButton = styled(ViewCode)`
+	padding: 6px 16px;
+`;
 
-const ThreeButton = styled(ViewCode)``;
+const ThreeButton = styled(ViewCode)`
+	padding: 6px 16px;
+`;
 
 const MainDiv = styled.div`
 	display: flex;
@@ -89,10 +103,6 @@ const MainDiv = styled.div`
 	height: 95%;
 	background-color: ${colors.blue100};
 	border-radius: 16px;
-`;
-
-const Display = styled.div`
-	display: flex;
 `;
 
 export default Output;

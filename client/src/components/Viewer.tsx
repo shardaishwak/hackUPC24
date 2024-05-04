@@ -25,9 +25,17 @@ const Viewer: React.FC<Props> = (props) => {
 		(async () => {
 			const htmlContent = await fetchVersion(versionId);
 			if (!htmlContent) return;
-			const blob = new Blob([htmlContent.replace("html ```", "")], {
-				type: "text/html",
-			});
+			const blob = new Blob(
+				[
+					htmlContent
+						.replace("html ```", "")
+						.replace("html", "")
+						.replace("```", ""),
+				],
+				{
+					type: "text/html",
+				}
+			);
 			const url = URL.createObjectURL(blob);
 			setVersionUrl(url);
 		})();

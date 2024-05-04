@@ -21,6 +21,7 @@ export interface Document extends MongooseDocument {
 	title: string;
 	created_at: Date;
 	updated_at: Date;
+	type: "2D" | "3D";
 }
 
 const VersionModel = new mongoose.Schema<Version>({
@@ -72,6 +73,11 @@ const DocumentModel = new mongoose.Schema<Document>({
 	updated_at: {
 		type: Date,
 		default: new Date(),
+	},
+	type: {
+		type: String,
+		enum: ["2D", "3D"],
+		default: "2D",
 	},
 });
 

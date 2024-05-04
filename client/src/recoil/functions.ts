@@ -6,7 +6,12 @@ export const getUser = async (uid: string) => {
 	return data;
 };
 
-export const ask = async (uid: string, prompt: string, documentId?: string) => {
+export const ask = async (
+	uid: string,
+	prompt: string,
+	_type: string,
+	documentId?: string
+) => {
 	const response = await fetch("http://localhost:5001/ask", {
 		method: "POST",
 		headers: {
@@ -15,6 +20,7 @@ export const ask = async (uid: string, prompt: string, documentId?: string) => {
 		body: JSON.stringify({
 			prompt,
 			uid,
+			engine: _type,
 			...(documentId ? { documentID: documentId } : {}),
 		}),
 	});

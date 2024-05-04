@@ -13,9 +13,10 @@
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
+    "react-icons": "^5.2.0",
     "react-syntax-highlighter": "^15.5.0",
-    "replexica": "^0.21.3",
     "recoil": "^0.7.7",
+    "replexica": "^0.21.3",
     "styled-components": "^6.1.9"
   },
   "devDependencies": {
