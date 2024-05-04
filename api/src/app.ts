@@ -139,7 +139,7 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 		document.updated_at = new Date();
 		await document.save();
 
-		res.send(document);
+		res.send(version);
 	} catch (err) {
 		next(err);
 	}
