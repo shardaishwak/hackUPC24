@@ -79,7 +79,7 @@ const Sidebar = () => {
 						<Links>
 							<Tag>Today</Tag>
 							{documents.today.map((document) => (
-								<CustomLink key={document._id} href="#">
+								<CustomLink key={document._id} href={"/d/" + document._id}>
 									{document.title}
 								</CustomLink>
 							))}
@@ -89,7 +89,7 @@ const Sidebar = () => {
 						<Links>
 							<Tag>Yesterday</Tag>
 							{documents.yesterday.map((document) => (
-								<CustomLink key={document._id} href="#">
+								<CustomLink key={document._id} href={"/d/" + document._id}>
 									{document.title}
 								</CustomLink>
 							))}
@@ -99,7 +99,7 @@ const Sidebar = () => {
 						<Links>
 							<Tag>This Week</Tag>
 							{documents.thisWeek.map((document) => (
-								<CustomLink key={document._id} href="#">
+								<CustomLink key={document._id} href={"/d/" + document._id}>
 									{document.title}
 								</CustomLink>
 							))}
@@ -109,7 +109,7 @@ const Sidebar = () => {
 						<Links>
 							<Tag>Last Week</Tag>
 							{documents.lastWeek.map((document) => (
-								<CustomLink key={document._id} href="#">
+								<CustomLink key={document._id} href={"/d/" + document._id}>
 									{document.title}
 								</CustomLink>
 							))}
