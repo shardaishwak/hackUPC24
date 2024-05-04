@@ -1,6 +1,6 @@
 import mongoose, { Document as MongooseDocument } from "mongoose";
 
-export interface IUser extends MongooseDocument {
+export interface User extends MongooseDocument {
 	uid: number;
 	documents: Document[];
 }
@@ -14,7 +14,7 @@ export interface Version extends MongooseDocument {
 	level: number;
 }
 
-export interface IDocument extends MongooseDocument {
+export interface Document extends MongooseDocument {
 	_id: number;
 	versions: Version[];
 	versions_count: number;
@@ -46,7 +46,7 @@ const VersionModel = new mongoose.Schema<Version>({
 	},
 });
 
-const DocumentModel = new mongoose.Schema<IDocument>({
+const DocumentModel = new mongoose.Schema<Document>({
 	versions: {
 		// reference to version document
 		type: [
@@ -75,7 +75,7 @@ const DocumentModel = new mongoose.Schema<IDocument>({
 	},
 });
 
-const UserModel = new mongoose.Schema<IUser>({
+const UserModel = new mongoose.Schema<User>({
 	uid: {
 		type: Number,
 		required: true,
@@ -92,6 +92,6 @@ const UserModel = new mongoose.Schema<IUser>({
 	},
 });
 
-export const User = mongoose.model<IUser>("User", UserModel);
-export const Document = mongoose.model<IDocument>("Document", DocumentModel);
+export const User = mongoose.model<User>("User", UserModel);
+export const Document = mongoose.model<Document>("Document", DocumentModel);
 export const Version = mongoose.model<Version>("Version", VersionModel);

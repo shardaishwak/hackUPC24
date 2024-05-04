@@ -5,7 +5,7 @@ import helmet from "helmet";
 import cors from "cors";
 import BodyParser from "body-parser";
 import ErrorWithStatus from "./ErrorWithStatus";
-import { Document, IDocument, User, Version } from "./models";
+import { Document, Document as IDocument, User, Version } from "./models";
 
 // load env
 
@@ -134,7 +134,7 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 			prompt: prompt,
 			created_at: new Date(),
 		});
-		document.versions.push(version);
+		document.versions.push(version.id);
 		document.versions_count += 1;
 		document.updated_at = new Date();
 		await document.save();
@@ -151,9 +151,17 @@ app.get(
 		try {
 			const { uid } = req.params;
 			// lol poor server
-			const user = await User.findOne({ uid }).populate(
-				"documents documents.versions"
-			);
+			const user = await User.findOne({ uid })
+				.populate("documents")
+				.populate({
+					path: "documents",
+					populate: {
+						path: "versions",
+					},
+				});
+			// user?.documents.forEach(doc  => {
+			// 	doc.versions = doc.versions.map(async version => await Version.findById(version))
+			// })
 			if (!user) {
 				// create a new user if not existing yet
 				const user = await User.create({
