@@ -8,6 +8,7 @@ import Input from "@/components/input";
 import styled from "styled-components";
 import Output from "@/components/output";
 import Viewer from "@/components/Viewer";
+import SmallSidebar from "@/components/SmallSidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
