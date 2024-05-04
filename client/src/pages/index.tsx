@@ -3,6 +3,10 @@ import Image from "next/image";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import Sidebar from "@/components/Sidebar";
+import Prompts from "@/components/prompts";
+import Input from "@/components/input";
+import styled from "styled-components";
+import Output from "@/components/output"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,9 +19,29 @@ export default function Home() {
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<main className={`${inter.className}`}>
+			<Main className={`${inter.className}`}>
 				<Sidebar />
-			</main>
+				<Container>
+					<Prompts />
+					<Input />
+				</Container>
+				<Output />
+				<div></div>
+			</Main>
 		</>
 	);
 }
+
+const Main = styled.div`
+	display: grid;
+	grid-template-columns: 256px 4fr 5fr 50px;
+`;
+
+const Container = styled.div`
+	display: flex;
+	height: 100vh;
+	flex-direction: column;
+	justify-content: space-between;
+	box-sizing: border-box;
+	padding: 8px;
+`;

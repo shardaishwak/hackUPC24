@@ -53,12 +53,10 @@ const Sidebar = () => {
 
 const Container = styled.div`
 	height: 100vh;
-	width: 256px;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 	background: ${colors.blue100};
-
 	border-top-right-radius: 16px;
 	border-bottom-right-radius: 16px;
 `;
