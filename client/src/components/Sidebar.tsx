@@ -8,38 +8,123 @@ import {
 } from "../../typography";
 import colors from "../../colors";
 import Image from "next/image";
+import { useRecoilValue } from "recoil";
+import { Document, userState } from "@/recoil";
+import { useAuth0 } from "@auth0/auth0-react";
+
+const array_partitioning = (documents) => {
+	// Get today's date
+	let today = new Date();
+	today.setHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0 for accurate comparison
+
+	// Get yesterday's date
+	let yesterday = new Date(today);
+	yesterday.setDate(yesterday.getDate() - 1);
+
+	// Get the start and end dates for this week
+	let startOfThisWeek = new Date(today);
+	startOfThisWeek.setDate(today.getDate() - today.getDay()); // Set to the first day of the week (Sunday)
+	let endOfThisWeek = new Date(startOfThisWeek);
+	endOfThisWeek.setDate(startOfThisWeek.getDate() + 6); // Set to the last day of the week (Saturday)
+
+	// Get the start and end dates for last week
+	let startOfLastWeek = new Date(startOfThisWeek);
+	startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
+	let endOfLastWeek = new Date(endOfThisWeek);
+	endOfLastWeek.setDate(endOfLastWeek.getDate() - 7);
+
+	let todayDocuments: Array<Document> = [];
+	let yesterdayDocuments: Array<Document> = [];
+	let thisWeekDocuments: Array<Document> = [];
+	let lastWeekDocuments: Array<Document> = [];
+
+	// Iterate through documents and categorize each document based on its updated_at date
+	documents.forEach((document) => {
+		let updatedAt = new Date(document.updated_at);
+
+		// Set hours, minutes, seconds, and milliseconds to 0 for accurate comparison
+		updatedAt.setHours(0, 0, 0, 0);
+
+		if (updatedAt.getTime() === today.getTime()) {
+			todayDocuments.push(document);
+		} else if (updatedAt.getTime() === yesterday.getTime()) {
+			yesterdayDocuments.push(document);
+		} else if (updatedAt >= startOfThisWeek && updatedAt <= endOfThisWeek) {
+			thisWeekDocuments.push(document);
+		} else if (updatedAt >= startOfLastWeek && updatedAt <= endOfLastWeek) {
+			lastWeekDocuments.push(document);
+		}
+	});
+
+	return {
+		today: todayDocuments,
+		yesterday: yesterdayDocuments,
+		thisWeek: thisWeekDocuments,
+		lastWeek: lastWeekDocuments,
+	};
+};
 
 const Sidebar = () => {
+	const db_user = useRecoilValue(userState);
+	const documents = array_partitioning(db_user.documents);
+	const { user } = useAuth0();
 	return (
 		<Container>
 			<div>
 				<Title>Framer Ai</Title>
+				{/** Add button */}
+
 				<Lister>
-					<Links>
-						<Tag>Pages</Tag>
-						<CustomLink href="#">Genreate a framer game</CustomLink>
-						<CustomLink href="#">
-							Simulate per percolation of objects
-						</CustomLink>
-						<CustomLink href="#">Imagine a car moving in the bot</CustomLink>
-					</Links>
-					<Links>
-						<Tag>Pages</Tag>
-						<CustomLink href="#">Genreate a framer game</CustomLink>
-						<CustomLink href="#">
-							Simulate per percolation of objects
-						</CustomLink>
-						<CustomLink href="#">Imagine a car moving in the bot</CustomLink>
-					</Links>
+					{documents.today.length > 0 && (
+						<Links>
+							<Tag>Today</Tag>
+							{documents.today.map((document) => (
+								<CustomLink key={document._id} href="#">
+									{document.title}
+								</CustomLink>
+							))}
+						</Links>
+					)}
+					{documents.yesterday.length > 0 && (
+						<Links>
+							<Tag>Yesterday</Tag>
+							{documents.yesterday.map((document) => (
+								<CustomLink key={document._id} href="#">
+									{document.title}
+								</CustomLink>
+							))}
+						</Links>
+					)}
+					{documents.thisWeek.length > 0 && (
+						<Links>
+							<Tag>This Week</Tag>
+							{documents.thisWeek.map((document) => (
+								<CustomLink key={document._id} href="#">
+									{document.title}
+								</CustomLink>
+							))}
+						</Links>
+					)}
+					{documents.lastWeek.length > 0 && (
+						<Links>
+							<Tag>Last Week</Tag>
+							{documents.lastWeek.map((document) => (
+								<CustomLink key={document._id} href="#">
+									{document.title}
+								</CustomLink>
+							))}
+						</Links>
+					)}
 				</Lister>
 			</div>
 			<UserContainer>
 				<UserInfo>
 					<Image
-						src="/women.jpg"
+						src={user?.picture || "/women.jpg"}
 						width={40}
 						height={40}
 						style={{ objectFit: "cover", borderRadius: 99 }}
+						alt="User profile picture"
 					/>
 					<UserText>John Doe</UserText>
 				</UserInfo>

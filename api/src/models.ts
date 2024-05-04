@@ -19,6 +19,8 @@ export interface IDocument extends MongooseDocument {
 	versions: Version[];
 	versions_count: number;
 	title: string;
+	created_at: Date;
+	updated_at: Date;
 }
 
 const VersionModel = new mongoose.Schema<Version>({
@@ -62,6 +64,14 @@ const DocumentModel = new mongoose.Schema<IDocument>({
 	title: {
 		type: String,
 		required: true,
+	},
+	created_at: {
+		type: Date,
+		default: new Date(),
+	},
+	updated_at: {
+		type: Date,
+		default: new Date(),
 	},
 });
 
