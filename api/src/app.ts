@@ -136,6 +136,7 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 		});
 		document.versions.push(version);
 		document.versions_count += 1;
+		document.updated_at = new Date();
 		await document.save();
 
 		res.send(document);
@@ -149,9 +150,17 @@ app.get(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const { uid } = req.params;
-			const user = await User.findOne({ uid }).populate("documents");
+			// lol poor server
+			const user = await User.findOne({ uid }).populate(
+				"documents documents.versions"
+			);
 			if (!user) {
-				throw new ErrorWithStatus("User not found", 404);
+				// create a new user if not existing yet
+				const user = await User.create({
+					uid,
+				});
+				res.send(user);
+				return;
 			}
 			res.send(user);
 		} catch (err) {
