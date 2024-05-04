@@ -21,8 +21,9 @@ const openai = new OpenAI({
 
 app.post("/user", async (req: Request, res: Response, next: NextFunction) => {
 	try {
+		const { uid } = req.body;
 		const user = await User.create({
-			uid: Math.floor(Math.random() * 1000000),
+			uid,
 		});
 		res.send(user);
 	} catch (err) {
@@ -55,12 +56,14 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 					title: prompt,
 				});
 				user.documents.push(document.id);
+				await user.save();
 			}
 		} else {
 			document = await Document.create({
 				title: prompt,
 			});
 			user.documents.push(document.id);
+			await user.save();
 		}
 
 		const engine_prompt = `
@@ -94,7 +97,8 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 				{ role: "system", content: setup_prompt },
 				{ role: "user", content: prompt },
 			],
-			model: "gpt-4-turbo",
+			// model: "gpt-4-turbo",
+			model: "gpt-3.5-turbo",
 		});
 
 		if (
@@ -109,7 +113,7 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 
 		// create a new document version
 		const version = await Version.create({
-			_id: document.versions_count + 1,
+			level: document.versions_count + 1,
 			title: prompt,
 			content: result,
 			prompt: prompt,
@@ -167,6 +171,24 @@ app.delete(
 				throw new ErrorWithStatus("Document not found", 404);
 			}
 			res.send(document);
+		} catch (err) {
+			next(err);
+		}
+	}
+);
+
+// render a version
+app.get(
+	"/version/:id",
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { id } = req.params;
+			const version = await Version.findById(id);
+			if (!version) {
+				throw new ErrorWithStatus("Version not found", 404);
+			}
+			//html conten
+			res.send(version.content);
 		} catch (err) {
 			next(err);
 		}
