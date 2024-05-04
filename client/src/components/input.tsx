@@ -21,7 +21,7 @@ const Input: React.FC<{ onClick: (value: string) => void }> = (props) => {
 	const text: any = useLanguage(["write_a_prompt"]);
 
 	const handleInputChange = (event) => {
-		const value = event.target.value;
+		const value = event.target.textContent;
 		setInputValue(value);
 		updateImageFilter(value);
 	};
@@ -39,7 +39,7 @@ const Input: React.FC<{ onClick: (value: string) => void }> = (props) => {
 		<Container>
 			<Container2 id="inputprompt">
 				<InputField
-					onChange={handleInputChange}
+					onInput={handleInputChange}
 					type="text"
 					id="inputfield"
 					placeholder={text.write_a_prompt}

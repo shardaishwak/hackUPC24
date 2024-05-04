@@ -69,6 +69,7 @@ export const userState = atom<UserState>({
 export const generalState = atom({
 	key: "generalState",
 	default: {
-		locale: "fr",
+		locale: "en",
+		message: "",
 	},
 });

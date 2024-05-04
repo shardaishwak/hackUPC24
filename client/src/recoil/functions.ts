@@ -18,9 +18,16 @@ export const ask = async (uid: string, prompt: string, documentId?: string) => {
 			...(documentId ? { documentID: documentId } : {}),
 		}),
 	});
+
+	const type =
+		response.status === 200
+			? "html"
+			: response.status === 202
+			? "message"
+			: "error";
 	const ask_data = await response.json();
 
-	return ask_data;
+	return [type, ask_data];
 };
 
 export const getDocument = async (documentId: string) => {

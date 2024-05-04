@@ -8,7 +8,7 @@ import Output from "@/components/output";
 import SmallSidebar from "@/components/SmallSidebar";
 import React, { use } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { Document, documentState, userState } from "@/recoil";
+import { Document, documentState, generalState, userState } from "@/recoil";
 import { useRouter } from "next/router";
 import { ask, getDocument, getUser } from "@/recoil/functions";
 import { Auth } from "../_app";
@@ -23,6 +23,7 @@ const DocumentRender: React.FC<{ documentId?: string; document?: Document }> = (
 	const setUser = useSetRecoilState(userState);
 
 	const setDocuments = useSetRecoilState(documentState);
+	const setGeneral = useSetRecoilState(generalState);
 
 	const [currentVersion, setCurrentVersion] = React.useState(
 		(document?.versions?.length || 1) - 1
@@ -31,17 +32,32 @@ const DocumentRender: React.FC<{ documentId?: string; document?: Document }> = (
 	const callbackAsk = React.useCallback(
 		async (value) => {
 			if (!uid) return;
-			await ask(uid, value, documentId);
-			const documentWithVersions = await getDocument(documentId);
-			// it is in format [key]: value
-			setDocuments((prev) => {
-				return {
-					documents: {
-						...prev.documents,
-						[documentId]: documentWithVersions,
-					},
-				};
-			});
+			const [type, result] = await ask(uid, value, documentId);
+
+			if (type === "message") {
+				// do something with ask_data.message
+				setGeneral((prev) => ({
+					...prev,
+					message: result.message,
+				}));
+			} else if (type === "error") {
+				// do something with ask_data.error
+				setGeneral((prev) => ({
+					...prev,
+					message: result.error,
+				}));
+			} else {
+				const documentWithVersions = await getDocument(documentId);
+				// it is in format [key]: value
+				setDocuments((prev) => {
+					return {
+						documents: {
+							...prev.documents,
+							[documentId]: documentWithVersions,
+						},
+					};
+				});
+			}
 		},
 		[uid, documentId]
 	);

@@ -9,7 +9,7 @@ import Viewer from "@/components/Viewer";
 import SmallSidebar from "@/components/SmallSidebar";
 import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { userState } from "@/recoil";
+import { generalState, userState } from "@/recoil";
 import { useRouter } from "next/router";
 import { ask, getUser } from "@/recoil/functions";
 import { Auth } from "./_app";
@@ -76,6 +76,7 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 	];
 
 	const [selectedPrompts, setSelectedPrompts] = React.useState<string[]>([]);
+	const setGeneral = useSetRecoilState(generalState);
 
 	React.useEffect(() => {
 		setSelectedPrompts(selectFourItems(prompts));
@@ -86,11 +87,27 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 			if (!uid) return;
 			setSelected(value);
 			setTemporaryPrompt(value);
-			const ask_data = await ask(uid, value, documentId);
+			const [type, ask_data] = await ask(uid, value, documentId);
 
-			if (!documentId) {
-				router.push("/d/" + ask_data?.document?._id);
+			if (type === "message") {
+				// do something with ask_data.message
+				setGeneral((prev) => ({
+					...prev,
+					message: ask_data.message,
+				}));
+			} else if (type === "error") {
+				// do something with ask_data.error
+				setGeneral((prev) => ({
+					...prev,
+					message: ask_data.error,
+				}));
+			} else {
+				if (!documentId) {
+					router.push("/d/" + ask_data?.document?._id);
+				}
 			}
+			setTemporaryPrompt(null);
+			setSelected(null);
 		},
 		[uid, documentId]
 	);

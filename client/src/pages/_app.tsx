@@ -1,4 +1,4 @@
-import { documentState, userState } from "@/recoil";
+import { documentState, generalState, userState } from "@/recoil";
 import { getUser } from "@/recoil/functions";
 import "@/styles/globals.css";
 import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
@@ -7,7 +7,7 @@ import { Inter } from "next/font/google";
 import React from "react";
 import { RecoilRoot, useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { heading5, heading6 } from "../../typography";
+import { bodyMobileTablet2, heading5, heading6 } from "../../typography";
 import { useLanguage } from "@/i18n";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -65,6 +65,29 @@ export const Auth = (props) => {
 	}
 };
 
+const Message = () => {
+	const message = useRecoilValue(generalState).message;
+	const setGeneral = useSetRecoilState(generalState);
+
+	React.useEffect(() => {
+		if (message) {
+			setTimeout(() => {
+				setGeneral((prev) => ({
+					...prev,
+					message: "",
+				}));
+			}, 5000);
+		}
+	}, [message]);
+	if (message)
+		return (
+			<MessagePopupContainer LoadingContainer className={inter.className}>
+				{message}
+			</MessagePopupContainer>
+		);
+	else return null;
+};
+
 export default function App({ Component, pageProps }: AppProps) {
 	return (
 		<Auth0Provider
@@ -75,6 +98,7 @@ export default function App({ Component, pageProps }: AppProps) {
 			}}
 		>
 			<RecoilRoot>
+				<Message />
 				<Component {...pageProps} />
 			</RecoilRoot>
 		</Auth0Provider>
@@ -99,4 +123,17 @@ const LoadingContainer = styled.div`
 	}
 
 	z-index: 999;
+`;
+
+const MessagePopupContainer = styled.div`
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	background: white;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+	border-radius: 8px;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+
+	${bodyMobileTablet2}
+	padding: 12px;
 `;

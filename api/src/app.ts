@@ -142,7 +142,7 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 		if (result.includes("ERROR_444")) {
 			throw new ErrorWithStatus(result.split("ERROR_444-")?.[1], 400);
 		}
-		if (result.includes("MESSAGE")) {
+		if (result.includes("MESSAGE-")) {
 			res.status(202).send({
 				message: result.split("MESSAGE-")?.[1],
 			});
