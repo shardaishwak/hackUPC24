@@ -1,4 +1,5 @@
 import { userState } from "@/recoil";
+import { getUser } from "@/recoil/functions";
 import "@/styles/globals.css";
 import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
 import type { AppProps } from "next/app";
@@ -6,33 +7,21 @@ import React from "react";
 import { RecoilRoot, useSetRecoilState } from "recoil";
 
 const Auth = () => {
-	const { user, isAuthenticated, loginWithRedirect } = useAuth0();
+	const { user, isAuthenticated } = useAuth0();
 	const setUser = useSetRecoilState(userState);
 
 	React.useEffect(() => {
 		(async () => {
-			if (isAuthenticated) {
-				const res = await fetch(
-					"http://localhost:5001/user/" + user?.sub?.split("|")[1],
-					{
-						method: "GET",
-					}
-				);
-				const data = await res.json();
+			if (isAuthenticated && user?.sub) {
+				const userData = await getUser(user?.sub?.split("|")?.[1]);
 				setUser({
-					_id: data._id,
-					uid: data.uid,
-					documents: data.documents,
+					_id: userData._id,
+					uid: userData.uid,
+					documents: userData.documents,
 				});
 			}
 		})();
-	}, [isAuthenticated]);
-
-	return (
-		<button onClick={() => loginWithRedirect()} disabled={isAuthenticated}>
-			Login
-		</button>
-	);
+	}, [isAuthenticated, setUser, user?.sub]);
 };
 
 export default function App({ Component, pageProps }: AppProps) {

@@ -94,19 +94,29 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
             You need to follow the best practices and make sure that the code is clean and well-organized.
             You only return the code that is executable in the browser in one single file.
             Your output should be in the following JSON format:
-            only html code
-            If the user asks something inappropriate or out of context, do not return anything.
+            only html code with embedded css and js
+            If the user asks something inappropriate, return format ERROR_444-{message}
             do not write anything. Just give code. No JSON, just HTML code.
 
             your code needs to be complete. Try to give it as many features as possible.
+
+			The user can make the application as complex as they want.
+			
         `;
 
 		const messages = [{ role: "system", content: setup_prompt }];
 		// load previous version history and genreate a new version
-		document.versions.forEach((version) => {
-			messages.push({ role: "user", content: version.prompt });
-			messages.push({ role: "assistant", content: version.content });
-		});
+		// document.versions.forEach((version) => {
+		// 	messages.push({ role: "user", content: version.prompt });
+		// 	messages.push({ role: "assistant", content: version.content });
+		// });
+
+		//load the last version
+		if (document.versions.length > 0) {
+			const lastVersion = document.versions[document.versions.length - 1];
+			messages.push({ role: "user", content: lastVersion.prompt });
+			messages.push({ role: "assistant", content: lastVersion.content });
+		}
 
 		messages.push({ role: "user", content: prompt });
 
@@ -126,6 +136,10 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 
 		const result = chatCompletion.choices[0].message.content.replace("```", "");
 
+		if (result.includes("ERROR_444")) {
+			throw new ErrorWithStatus(result.split("ERROR_444-")?.[1], 400);
+		}
+
 		// create a new document version
 		const version = await Version.create({
 			level: document.versions_count + 1,
@@ -139,7 +153,10 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 		document.updated_at = new Date();
 		await document.save();
 
-		res.send(version);
+		res.send({
+			document,
+			version,
+		});
 	} catch (err) {
 		next(err);
 	}

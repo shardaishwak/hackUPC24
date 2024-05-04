@@ -25,7 +25,9 @@ const Viewer: React.FC<Props> = (props) => {
 		(async () => {
 			const htmlContent = await fetchVersion(versionId);
 			if (!htmlContent) return;
-			const blob = new Blob([htmlContent], { type: "text/html" });
+			const blob = new Blob([htmlContent.replace("html ```", "")], {
+				type: "text/html",
+			});
 			const url = URL.createObjectURL(blob);
 			setVersionUrl(url);
 		})();
@@ -33,16 +35,18 @@ const Viewer: React.FC<Props> = (props) => {
 
 	return (
 		<Container>
-			{versionUrl}
-			<h1>Viewer</h1>
 			<iframe src={versionUrl} width="100%" height="100%"></iframe>
 		</Container>
 	);
 };
 
 const Container = styled.div`
-	width: 300px;
-	height: 100vh;
+	height: 100%;
+	width: 100%;
+
+	iframe {
+		border: none;
+	}
 `;
 
 export default Viewer;

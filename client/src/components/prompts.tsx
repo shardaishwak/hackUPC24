@@ -1,53 +1,52 @@
 import styled from "styled-components";
-import {
-	bodyDesktop1,
-	bodyDesktop2,
-	bodyDesktop3,
-	bodyMobileTablet1,
-	bodyMobileTablet2,
-	bodyMobileTablet3,
-	heading1,
-	limitLines,
-} from "../../typography";
-import colors from "../../colors";
-import Image from "next/image";
-import { Roboto_Flex } from "next/font/google";
 
-const Prompts = () => {
-    return (
-        <Container>
-            <Container1 id="mainContainer">
-                <Container3></Container3>
-              <p>Here goes the input of the user</p>  
-            </Container1>
-            <Container2>
-                <p>Here goes the output of the machine</p>
-            </Container2>
-        </Container>
-    )
-}
+import UserBlock from "./UserBlock";
+import { useAuth0 } from "@auth0/auth0-react";
+import React from "react";
+import { Version } from "@/recoil";
+
+const Prompts: React.FC<{ list: Version[] }> = (props) => {
+	const { list = [] } = props;
+	const { user } = useAuth0();
+	return (
+		<Container>
+			<List>
+				{list.map((item) => {
+					return (
+						<>
+							<UserBlock
+								agent="You"
+								image={user?.picture || "/women.jpg"}
+								value={item.prompt}
+							/>
+							<UserBlock
+								agent="Framer"
+								image="/agent.png"
+								value={"Generated version " + item.level + " for you!"}
+							/>
+						</>
+					);
+				})}
+			</List>
+		</Container>
+	);
+};
 
 const Container = styled.div`
-    display: flex;
-    width: 100%;
-    height:100vh;
-    flex-direction: column;
-    justify-content: flex-end;
+	display: flex;
+	width: 100%;
+	height: 100vh;
+	flex-direction: column;
+	justify-content: flex-end;
+	padding: 16px;
+	box-sizing: border-box;
 `;
 
-const Container1 = styled.div`
-    display: flex;
-    justify-content: flex-start;
-`;
-
-const Container2 = styled.div`
-    display: flex;
-    padding-top: 4px;
-    justify-content: flex-start;
-`;
-
-const Container3 = styled.div`
-    display: flex;
+const List = styled.div`
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	gap: 24px;
 `;
 
 export default Prompts;

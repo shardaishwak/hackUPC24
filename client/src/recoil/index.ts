@@ -56,7 +56,7 @@ export const versionState = atom<VersionState>({
 interface UserState {
 	_id: string;
 	uid: string;
-	documents: string[];
+	documents: Document[];
 }
 
 export const userState = atom<UserState>({

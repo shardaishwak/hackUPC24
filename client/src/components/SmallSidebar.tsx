@@ -12,7 +12,7 @@ const SmallSidebar: React.FC<{
 		<Container>
 			{Array.from({ length: versions_count }).map((_, index) => (
 				<Button
-					onSelect={() => onSelect(index)}
+					onClick={() => onSelect(index)}
 					key={index}
 					active={index === active_version}
 				>
@@ -24,11 +24,14 @@ const SmallSidebar: React.FC<{
 };
 
 const Container = styled.div`
+	width: 100%;
+	padding-top: 20px;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 	align-items: center;
 	height: 100vh;
+	border-left: 2px solid ${colors.blue200};
 `;
 
 const Button = styled.button<{ active?: boolean }>`
@@ -53,7 +56,7 @@ const Button = styled.button<{ active?: boolean }>`
 	${(props) =>
 		props.active &&
 		`
-        background: ${colors.instagram_gradient};
+        background: ${colors.facebook_gradient};
         color: white
     `}
 `;

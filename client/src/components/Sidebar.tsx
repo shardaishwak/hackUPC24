@@ -11,6 +11,7 @@ import Image from "next/image";
 import { useRecoilValue } from "recoil";
 import { Document, userState } from "@/recoil";
 import { useAuth0 } from "@auth0/auth0-react";
+import Link from "next/link";
 
 const array_partitioning = (documents) => {
 	// Get today's date
@@ -64,10 +65,11 @@ const array_partitioning = (documents) => {
 	};
 };
 
-const Sidebar = () => {
+const Sidebar = (props) => {
 	const db_user = useRecoilValue(userState);
 	const documents = array_partitioning(db_user.documents);
 	const { user } = useAuth0();
+	const { active_id } = props;
 	return (
 		<Container>
 			<div>
@@ -79,9 +81,11 @@ const Sidebar = () => {
 						<Links>
 							<Tag>Today</Tag>
 							{documents.today.map((document) => (
-								<CustomLink key={document._id} href={"/d/" + document._id}>
-									{document.title}
-								</CustomLink>
+								<Link href={"/d/" + document._id} key={document._id}>
+									<CustomLink active={document._id === active_id}>
+										{document.title}
+									</CustomLink>
+								</Link>
 							))}
 						</Links>
 					)}
@@ -89,9 +93,11 @@ const Sidebar = () => {
 						<Links>
 							<Tag>Yesterday</Tag>
 							{documents.yesterday.map((document) => (
-								<CustomLink key={document._id} href={"/d/" + document._id}>
-									{document.title}
-								</CustomLink>
+								<Link href={"/d/" + document._id} key={document._id}>
+									<CustomLink active={document._id === active_id}>
+										{document.title}
+									</CustomLink>
+								</Link>
 							))}
 						</Links>
 					)}
@@ -99,9 +105,11 @@ const Sidebar = () => {
 						<Links>
 							<Tag>This Week</Tag>
 							{documents.thisWeek.map((document) => (
-								<CustomLink key={document._id} href={"/d/" + document._id}>
-									{document.title}
-								</CustomLink>
+								<Link href={"/d/" + document._id} key={document._id}>
+									<CustomLink active={document._id === active_id}>
+										{document.title}
+									</CustomLink>
+								</Link>
 							))}
 						</Links>
 					)}
@@ -109,9 +117,11 @@ const Sidebar = () => {
 						<Links>
 							<Tag>Last Week</Tag>
 							{documents.lastWeek.map((document) => (
-								<CustomLink key={document._id} href={"/d/" + document._id}>
-									{document.title}
-								</CustomLink>
+								<Link href={"/d/" + document._id} key={document._id}>
+									<CustomLink active={document._id === active_id}>
+										{document.title}
+									</CustomLink>
+								</Link>
 							))}
 						</Links>
 					)}
@@ -157,6 +167,11 @@ const Links = styled.ul`
 	display: flex;
 	flex-direction: column;
 	margin-top: 16px;
+	text-decoration: none;
+
+	a {
+		text-decoration: none;
+	}
 `;
 
 const Tag = styled.p`
@@ -167,7 +182,7 @@ const Tag = styled.p`
 	margin-bottom: 8px;
 `;
 
-const CustomLink = styled.a`
+const CustomLink = styled.a<{ active?: boolean }>`
 	${bodyMobileTablet1}
 	text-decoration: none;
 	${limitLines(1)}
@@ -177,6 +192,14 @@ const CustomLink = styled.a`
 	border-top-right-radius: 16px;
 	border-bottom-right-radius: 16px;
 	color: ${colors.black};
+	text-decoration: none;
+
+	${(props) =>
+		props.active &&
+		`
+		background: ${colors.blue200};
+		
+	`}
 
 	&:hover {
 		background: ${colors.blue200};

@@ -5,32 +5,30 @@ import Prompts from "@/components/prompts";
 import Input from "@/components/input";
 import styled from "styled-components";
 import Output from "@/components/output";
-import Viewer from "@/components/Viewer";
 import SmallSidebar from "@/components/SmallSidebar";
 import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { userState } from "@/recoil";
+import { Document, userState } from "@/recoil";
 import { useRouter } from "next/router";
 import { ask, getUser } from "@/recoil/functions";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
-	const { documentId } = props;
+const DocumentRender: React.FC<{ documentId?: string; document?: Document }> = (
+	props
+) => {
+	const { documentId, document } = props;
 	const uid = useRecoilValue(userState).uid;
 	const setUser = useSetRecoilState(userState);
-	const router = useRouter();
+
+	const [currentVersion, setCurrentVersion] = React.useState(0);
 
 	const callbackAsk = React.useCallback(
 		async (value) => {
 			if (!uid) return;
-			const ask_data = await ask(value, uid, documentId);
-
-			if (!documentId) {
-				router.push("/d/" + ask_data?.document?._id);
-			}
-
+			await ask(value, uid, documentId);
 			const userData = await getUser(uid);
+
 			setUser({
 				_id: userData._id,
 				uid: userData.uid,
@@ -42,20 +40,31 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 	return (
 		<>
 			<Main className={`${inter.className}`}>
-				<Sidebar />
+				<Sidebar active_id={documentId} />
 				<Container>
-					<Prompts list={[]} />
+					<Prompts list={document?.versions || []} />
 					<Input onClick={callbackAsk} />
 				</Container>
-				<Output />
-				<div></div>
+				<Output version_id={document?.versions[currentVersion]?._id} />
+				<SmallSidebar
+					active_version={currentVersion}
+					versions_count={document?.versions?.length || 1}
+					onSelect={setCurrentVersion}
+				/>
 			</Main>
 		</>
 	);
 };
 
-export default function Home() {
-	const uid = useRecoilValue(userState).uid;
+export default function DocumentPage() {
+	const doc_id = useRouter().query.id as string;
+	const documents = useRecoilValue(userState).documents;
+	console.log(documents);
+
+	const document = documents.find((doc) => doc._id === doc_id);
+	if (!document) {
+		return <div>Document not found</div>;
+	}
 
 	return (
 		<>
@@ -65,7 +74,7 @@ export default function Home() {
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<DocumentRender />
+			<DocumentRender documentId={doc_id} document={document} />
 		</>
 	);
 }
