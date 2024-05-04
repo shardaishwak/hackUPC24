@@ -4,6 +4,7 @@ import colors from "../../colors";
 import Image from "next/image";
 import { Roboto_Flex } from "next/font/google";
 import Viewer from "./Viewer";
+import { bodyMobileTablet1 } from "../../typography";
 
 const Output: React.FC<{ version_id: string }> = (props) => {
 	return (
@@ -54,7 +55,19 @@ const TwoButton = styled.button``;
 
 const ThreeButton = styled.button``;
 
-const ViewCode = styled.button``;
+const ViewCode = styled.button`
+	margin-right: 16px;
+	padding: 6px 12px;
+	${bodyMobileTablet1}
+	border-radius: 30px;
+	background-color: ${colors.blue200};
+	border: none;
+	cursor: pointer;
+
+	&:hover {
+		background-color: ${colors.blue300};
+	}
+`;
 
 const MainDiv = styled.div`
 	display: flex;
