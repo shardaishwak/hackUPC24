@@ -13,21 +13,59 @@ import { userState } from "@/recoil";
 import { useRouter } from "next/router";
 import { ask, getUser } from "@/recoil/functions";
 import { Auth } from "./_app";
+import Image from "next/image";
+import {
+	bodyMobileTablet1,
+	bodyMobileTablet2,
+	heading0,
+	heading1,
+	heading9,
+} from "../../typography";
+import colors from "../../colors";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const prompts = [
+	"Create a simulation of a bustling city street at rush hour.",
+	"Animate a whimsical forest scene with talking animals and magical trees.",
+	"Design an underwater world filled with colorful fish and swaying coral reefs.",
+	"Bring to life a futuristic sci-fi cityscape complete with flying cars and towering skyscrapers.",
+	"Craft a fairytale castle surrounded by rolling hills and cascading waterfalls.",
+	"Illustrate a space adventure featuring astronauts exploring distant planets and encountering alien life forms.",
+	"Animate a lively concert scene with cheering crowds and flashing stage lights.",
+	"Create a historical reenactment of a famous battle or event from the past.",
+	"Design a fantasy kingdom ruled by mythical creatures like dragons and unicorns.",
+	"Bring a favorite childhood storybook to life with animated characters and vivid landscapes.",
+];
+
+function selectFourItems(array) {
+	const selectedItems = [];
+	while (selectedItems.length < 4) {
+		const randomIndex = Math.floor(Math.random() * array.length);
+		const selectedItem = array[randomIndex];
+		if (!selectedItems.includes(selectedItem)) {
+			selectedItems.push(selectedItem);
+		}
+	}
+	return selectedItems;
+}
 
 const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 	const { documentId } = props;
 	const uid = useRecoilValue(userState).uid;
 	const router = useRouter();
+	const [selected, setSelected] = React.useState<string | null>(null);
 
 	const [temporaryPrompt, setTemporaryPrompt] = React.useState<string | null>(
 		null
 	);
 
+	const selectedPrompts = selectFourItems(prompts);
+
 	const callbackAsk = React.useCallback(
 		async (value) => {
 			if (!uid) return;
+			setSelected(value);
 			setTemporaryPrompt(value);
 			const ask_data = await ask(uid, value, documentId);
 
@@ -58,6 +96,26 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 								: []
 						}
 					/>
+					{!selected && (
+						<EmptyContainer>
+							<Image
+								src={"/cloud.gif"}
+								width={300}
+								height={200}
+								style={{ objectFit: "cover", borderRadius: 20 }}
+								alt="Cloud"
+							/>
+							<Title>Framer Ai</Title>
+							<P>Create nice animation through our web app.</P>
+							<Suggestions>
+								{selectedPrompts.map((prompt) => (
+									<Suggestion key={prompt} onClick={() => callbackAsk(prompt)}>
+										{prompt}
+									</Suggestion>
+								))}
+							</Suggestions>
+						</EmptyContainer>
+					)}
 					<Input onClick={callbackAsk} />
 				</Container>
 			</Main>
@@ -97,4 +155,43 @@ const Container = styled.div`
 	padding: 8px;
 	width: 800px;
 	margin: 0 auto;
+`;
+
+const EmptyContainer = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	margin-bottom: 30%;
+`;
+
+const Title = styled.h1`
+	${heading0}
+	font-size: 42px;
+	margin-top: 36px;
+`;
+
+const P = styled.p`
+	${bodyMobileTablet2}
+	margin-top: 12px;
+	text-align: center;
+`;
+
+const Suggestions = styled.div`
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	width: 100%;
+	margin-top: 96px;
+`;
+
+const Suggestion = styled.div`
+	padding: 16px;
+	border: 2px solid ${colors.blue300};
+	border-radius: 16px;
+	cursor: pointer;
+	width: 40%;
+	opacity: 0.8;
 `;

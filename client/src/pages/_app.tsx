@@ -94,4 +94,6 @@ const LoadingContainer = styled.div`
 	p {
 		${heading5}
 	}
+
+	z-index: 999;
 `;

@@ -40,6 +40,7 @@ const Input: React.FC<{ onClick: (value: string) => void }> = (props) => {
 					type="text"
 					id="inputfield"
 					placeholder="Write a Prompt"
+					contentEditable="true"
 				></InputField>
 				<PlaceholderStyle />
 				<Img
@@ -68,15 +69,23 @@ const Container2 = styled.div`
 	align-items: center;
 	border: 2px solid ${colors.blue100};
 	border-radius: 16px;
+	overflow-y: auto;
 `;
 
-const InputField = styled.textarea`
-	display: flex;
+const InputField = styled.div`
 	width: 80%;
+	max-height: 200px;
 	padding-left: 8px;
 	border: none;
 	outline: none;
 	background-color: rgba(255, 255, 255, 0.5);
+	font-family: Inter;
+
+	&[placeholder]:empty:before {
+		content: attr(placeholder);
+		color: rgba(0, 0, 0, 0.2);
+		cursor: text;
+	}
 `;
 
 const Img = styled.img`

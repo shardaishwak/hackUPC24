@@ -68,7 +68,7 @@ const array_partitioning = (documents) => {
 const Sidebar = (props) => {
 	const db_user = useRecoilValue(userState);
 	const documents = array_partitioning(db_user.documents);
-	const { user } = useAuth0();
+	const { user, logout } = useAuth0();
 	const { active_id } = props;
 	return (
 		<Container>
@@ -151,7 +151,10 @@ const Sidebar = (props) => {
 						style={{ objectFit: "cover", borderRadius: 99 }}
 						alt="User profile picture"
 					/>
-					<UserText>John Doe</UserText>
+					<div>
+						<UserText>{user?.name || user?.preferred_username}</UserText>
+						<Exit onClick={() => logout()}>Exit</Exit>
+					</div>
 				</UserInfo>
 			</UserContainer>
 		</Container>
@@ -236,7 +239,13 @@ const UserInfo = styled.div`
 `;
 
 const UserText = styled.p`
+	${bodyMobileTablet1}
+`;
+
+const Exit = styled.p`
 	${bodyMobileTablet2}
+	color: ${colors.blue700};
+	cursor: pointer;
 `;
 
 export default Sidebar;
