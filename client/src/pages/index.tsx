@@ -12,30 +12,28 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { userState } from "@/recoil";
 import { useRouter } from "next/router";
 import { ask, getUser } from "@/recoil/functions";
+import { Auth } from "./_app";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 	const { documentId } = props;
 	const uid = useRecoilValue(userState).uid;
-	const setUser = useSetRecoilState(userState);
 	const router = useRouter();
+
+	const [temporaryPrompt, setTemporaryPrompt] = React.useState<string | null>(
+		null
+	);
 
 	const callbackAsk = React.useCallback(
 		async (value) => {
 			if (!uid) return;
-			const ask_data = await ask(value, uid, documentId);
+			setTemporaryPrompt(value);
+			const ask_data = await ask(uid, value, documentId);
 
 			if (!documentId) {
 				router.push("/d/" + ask_data?.document?._id);
 			}
-
-			const userData = await getUser(uid);
-			setUser({
-				_id: userData._id,
-				uid: userData.uid,
-				documents: userData.documents,
-			});
 		},
 		[uid, documentId]
 	);
@@ -44,11 +42,24 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 			<Main className={`${inter.className}`}>
 				<Sidebar />
 				<Container>
-					<Prompts list={[]} />
+					<Prompts
+						list={
+							temporaryPrompt
+								? ([
+										{
+											prompt: temporaryPrompt,
+											_id: "temp",
+											content: "Generating your game...",
+											created_at: new Date().toISOString(),
+											level: 1,
+											title: "Generating your game...",
+										},
+								  ] as any)
+								: []
+						}
+					/>
 					<Input onClick={callbackAsk} />
 				</Container>
-				<Output />
-				<div></div>
 			</Main>
 		</>
 	);
@@ -65,6 +76,8 @@ export default function Home() {
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
+			<Auth cacheDocs />
+
 			<DocumentRender />
 		</>
 	);
@@ -72,7 +85,7 @@ export default function Home() {
 
 const Main = styled.div`
 	display: grid;
-	grid-template-columns: 256px 4fr 5fr 70px;
+	grid-template-columns: 256px 1fr;
 `;
 
 const Container = styled.div`
@@ -82,4 +95,6 @@ const Container = styled.div`
 	justify-content: space-between;
 	box-sizing: border-box;
 	padding: 8px;
+	width: 800px;
+	margin: 0 auto;
 `;

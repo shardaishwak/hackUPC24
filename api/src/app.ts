@@ -96,6 +96,7 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
             Your output should be in the following JSON format:
             only html code with embedded css and js
             If the user asks something inappropriate, return format ERROR_444-{message}
+			If you just want to say something, return format MESSAGE-{message}
             do not write anything. Just give code. No JSON, just HTML code.
 
             your code needs to be complete. Try to give it as many features as possible.
@@ -134,10 +135,18 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 			throw new ErrorWithStatus("No response from the model", 500);
 		}
 
-		const result = chatCompletion.choices[0].message.content.replace("```", "");
+		const result = chatCompletion.choices[0].message.content
+			.replace("html ```", "")
+			.replace("```", "");
 
 		if (result.includes("ERROR_444")) {
 			throw new ErrorWithStatus(result.split("ERROR_444-")?.[1], 400);
+		}
+		if (result.includes("MESSAGE")) {
+			res.status(202).send({
+				message: result.split("MESSAGE-")?.[1],
+			});
+			return;
 		}
 
 		// create a new document version
@@ -168,14 +177,8 @@ app.get(
 		try {
 			const { uid } = req.params;
 			// lol poor server
-			const user = await User.findOne({ uid })
-				.populate("documents")
-				.populate({
-					path: "documents",
-					populate: {
-						path: "versions",
-					},
-				});
+			const user = await User.findOne({ uid }).populate("documents");
+
 			// user?.documents.forEach(doc  => {
 			// 	doc.versions = doc.versions.map(async version => await Version.findById(version))
 			// })

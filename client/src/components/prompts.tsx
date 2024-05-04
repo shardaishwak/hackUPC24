@@ -22,7 +22,11 @@ const Prompts: React.FC<{ list: Version[] }> = (props) => {
 							<UserBlock
 								agent="Framer"
 								image="/agent.png"
-								value={"Generated version " + item.level + " for you!"}
+								value={
+									item._id === "temp"
+										? "Generating..."
+										: "Generated version " + item.level + " for you!"
+								}
 							/>
 						</>
 					);

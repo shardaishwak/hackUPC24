@@ -6,11 +6,12 @@ import Input from "@/components/input";
 import styled from "styled-components";
 import Output from "@/components/output";
 import SmallSidebar from "@/components/SmallSidebar";
-import React from "react";
+import React, { use } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { Document, userState } from "@/recoil";
+import { Document, documentState, userState } from "@/recoil";
 import { useRouter } from "next/router";
-import { ask, getUser } from "@/recoil/functions";
+import { ask, getDocument, getUser } from "@/recoil/functions";
+import { Auth } from "../_app";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,18 +22,25 @@ const DocumentRender: React.FC<{ documentId?: string; document?: Document }> = (
 	const uid = useRecoilValue(userState).uid;
 	const setUser = useSetRecoilState(userState);
 
-	const [currentVersion, setCurrentVersion] = React.useState(0);
+	const setDocuments = useSetRecoilState(documentState);
+
+	const [currentVersion, setCurrentVersion] = React.useState(
+		(document?.versions.length || 1) - 1
+	);
 
 	const callbackAsk = React.useCallback(
 		async (value) => {
 			if (!uid) return;
-			await ask(value, uid, documentId);
-			const userData = await getUser(uid);
-
-			setUser({
-				_id: userData._id,
-				uid: userData.uid,
-				documents: userData.documents,
+			await ask(uid, value, documentId);
+			const documentWithVersions = await getDocument(documentId);
+			// it is in format [key]: value
+			setDocuments((prev) => {
+				return {
+					documents: {
+						...prev.documents,
+						[documentId]: documentWithVersions,
+					},
+				};
 			});
 		},
 		[uid, documentId]
@@ -58,12 +66,29 @@ const DocumentRender: React.FC<{ documentId?: string; document?: Document }> = (
 
 export default function DocumentPage() {
 	const doc_id = useRouter().query.id as string;
-	const documents = useRecoilValue(userState).documents;
-	console.log(documents);
+	const document = useRecoilValue(documentState).documents[doc_id];
 
-	const document = documents.find((doc) => doc._id === doc_id);
+	const setDocuments = useSetRecoilState(documentState);
+
+	React.useEffect(() => {
+		(async () => {
+			if (!doc_id) return;
+			const documentWithVersions = await getDocument(doc_id);
+			console.log(documentWithVersions);
+			// it is in format [key]: value
+			setDocuments((prev) => {
+				return {
+					documents: {
+						...prev.documents,
+						[doc_id]: documentWithVersions,
+					},
+				};
+			});
+		})();
+	}, [doc_id]);
+
 	if (!document) {
-		return <div>Document not found</div>;
+		return <div>Loading...</div>;
 	}
 
 	return (
@@ -74,6 +99,7 @@ export default function DocumentPage() {
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
+			<Auth />
 			<DocumentRender documentId={doc_id} document={document} />
 		</>
 	);

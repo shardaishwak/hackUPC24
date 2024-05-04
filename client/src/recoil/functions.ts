@@ -19,5 +19,14 @@ export const ask = async (uid: string, prompt: string, documentId?: string) => {
 		}),
 	});
 	const ask_data = await response.json();
+
 	return ask_data;
+};
+
+export const getDocument = async (documentId: string) => {
+	const res = await fetch("http://localhost:5001/document/" + documentId, {
+		method: "GET",
+	});
+	const data = await res.json();
+	return data;
 };

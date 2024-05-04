@@ -26,6 +26,7 @@ const SmallSidebar: React.FC<{
 const Container = styled.div`
 	width: 100%;
 	padding-top: 20px;
+	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
