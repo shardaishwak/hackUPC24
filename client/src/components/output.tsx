@@ -5,9 +5,11 @@ import Viewer from "./Viewer";
 import { bodyMobileTablet1 } from "../../typography";
 import React from "react";
 import Editor from "@/Editor";
+import { useLanguage } from "@/i18n";
 
 const Output: React.FC<{ version_id: string; code: string }> = (props) => {
 	const [showCode, setShowCode] = React.useState(false);
+	const text: any = useLanguage(["view_code"]);
 
 	return (
 		<Container>
@@ -18,7 +20,9 @@ const Output: React.FC<{ version_id: string; code: string }> = (props) => {
 					<ThreeButton>3D</ThreeButton>
 				</ViewButtons>
 
-				<ViewCode onClick={() => setShowCode(!showCode)}>View Code</ViewCode>
+				<ViewCode onClick={() => setShowCode(!showCode)}>
+					{text.view_code}
+				</ViewCode>
 			</TopButtons>
 
 			<MainDiv>

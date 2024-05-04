@@ -12,6 +12,7 @@ import { useRecoilValue } from "recoil";
 import { Document, userState } from "@/recoil";
 import { useAuth0 } from "@auth0/auth0-react";
 import Link from "next/link";
+import { useLanguage } from "@/i18n";
 
 const array_partitioning = (documents) => {
 	// Get today's date
@@ -70,6 +71,15 @@ const Sidebar = (props) => {
 	const documents = array_partitioning(db_user.documents);
 	const { user, logout } = useAuth0();
 	const { active_id } = props;
+
+	const text: any = useLanguage([
+		"new_doc",
+		"today",
+		"yesterday",
+		"this_week",
+		"last_week",
+		"exit",
+	]);
 	return (
 		<Container>
 			<div>
@@ -87,14 +97,14 @@ const Sidebar = (props) => {
 						}}
 						active={false}
 					>
-						Create a new document
+						{text.new_doc}
 					</CustomLink>
 				</Link>
 
 				<Lister>
 					{documents.today.length > 0 && (
 						<Links>
-							<Tag>Today</Tag>
+							<Tag>{text.today}</Tag>
 							{documents.today.map((document) => (
 								<Link href={"/d/" + document._id} key={document._id}>
 									<CustomLink active={document._id === active_id}>
@@ -106,7 +116,7 @@ const Sidebar = (props) => {
 					)}
 					{documents.yesterday.length > 0 && (
 						<Links>
-							<Tag>Yesterday</Tag>
+							<Tag>{text.yesterday}</Tag>
 							{documents.yesterday.map((document) => (
 								<Link href={"/d/" + document._id} key={document._id}>
 									<CustomLink active={document._id === active_id}>
@@ -118,7 +128,7 @@ const Sidebar = (props) => {
 					)}
 					{documents.thisWeek.length > 0 && (
 						<Links>
-							<Tag>This Week</Tag>
+							<Tag>{text.this_week}</Tag>
 							{documents.thisWeek.map((document) => (
 								<Link href={"/d/" + document._id} key={document._id}>
 									<CustomLink active={document._id === active_id}>
@@ -130,7 +140,7 @@ const Sidebar = (props) => {
 					)}
 					{documents.lastWeek.length > 0 && (
 						<Links>
-							<Tag>Last Week</Tag>
+							<Tag>{text.last_week}</Tag>
 							{documents.lastWeek.map((document) => (
 								<Link href={"/d/" + document._id} key={document._id}>
 									<CustomLink active={document._id === active_id}>
@@ -153,7 +163,7 @@ const Sidebar = (props) => {
 					/>
 					<div>
 						<UserText>{user?.name || user?.preferred_username}</UserText>
-						<Exit onClick={() => logout()}>Exit</Exit>
+						<Exit onClick={() => logout()}>{text.exit}</Exit>
 					</div>
 				</UserInfo>
 			</UserContainer>
@@ -240,6 +250,8 @@ const UserInfo = styled.div`
 
 const UserText = styled.p`
 	${bodyMobileTablet1}
+	font-weight: 600;
+	text-transform: capitalize;
 `;
 
 const Exit = styled.p`

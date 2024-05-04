@@ -8,6 +8,7 @@ import React from "react";
 import { RecoilRoot, useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { heading5, heading6 } from "../../typography";
+import { useLanguage } from "@/i18n";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +18,8 @@ export const Auth = (props) => {
 
 	const setDocuments = useSetRecoilState(documentState);
 	const documents = useRecoilValue(documentState);
+
+	const text: any = useLanguage(["loading"]);
 
 	console.log(documents);
 
@@ -56,7 +59,7 @@ export const Auth = (props) => {
 		return (
 			<LoadingContainer className={inter.className}>
 				<h1>Framer Ai</h1>
-				<p>Loading...</p>
+				<p>{text.loading}...</p>
 			</LoadingContainer>
 		);
 	}

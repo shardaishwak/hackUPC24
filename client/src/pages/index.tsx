@@ -22,21 +22,9 @@ import {
 	heading9,
 } from "../../typography";
 import colors from "../../colors";
+import { useLanguage } from "@/i18n";
 
 const inter = Inter({ subsets: ["latin"] });
-
-const prompts = [
-	"Create a simulation of a bustling city street at rush hour.",
-	"Animate a whimsical forest scene with talking animals and magical trees.",
-	"Design an underwater world filled with colorful fish and swaying coral reefs.",
-	"Bring to life a futuristic sci-fi cityscape complete with flying cars and towering skyscrapers.",
-	"Craft a fairytale castle surrounded by rolling hills and cascading waterfalls.",
-	"Illustrate a space adventure featuring astronauts exploring distant planets and encountering alien life forms.",
-	"Animate a lively concert scene with cheering crowds and flashing stage lights.",
-	"Create a historical reenactment of a famous battle or event from the past.",
-	"Design a fantasy kingdom ruled by mythical creatures like dragons and unicorns.",
-	"Bring a favorite childhood storybook to life with animated characters and vivid landscapes.",
-];
 
 function selectFourItems(array) {
 	const selectedItems = [];
@@ -60,7 +48,38 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 		null
 	);
 
-	const selectedPrompts = selectFourItems(prompts);
+	const text: any = useLanguage([
+		"prompt_1",
+		"prompt_2",
+		"prompt_3",
+		"prompt_4",
+		"prompt_5",
+		"prompt_6",
+		"prompt_7",
+		"prompt_8",
+		"prompt_9",
+		"prompt_10",
+		"paragraph",
+	]);
+
+	const prompts = [
+		text.prompt_1,
+		text.prompt_2,
+		text.prompt_3,
+		text.prompt_4,
+		text.prompt_5,
+		text.prompt_6,
+		text.prompt_7,
+		text.prompt_8,
+		text.prompt_9,
+		text.prompt_10,
+	];
+
+	const [selectedPrompts, setSelectedPrompts] = React.useState<string[]>([]);
+
+	React.useEffect(() => {
+		setSelectedPrompts(selectFourItems(prompts));
+	}, []);
 
 	const callbackAsk = React.useCallback(
 		async (value) => {
@@ -106,7 +125,7 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 								alt="Cloud"
 							/>
 							<Title>Framer Ai</Title>
-							<P>Create nice animation through our web app.</P>
+							<P>{text.paragraph}</P>
 							<Suggestions>
 								{selectedPrompts.map((prompt) => (
 									<Suggestion key={prompt} onClick={() => callbackAsk(prompt)}>
@@ -124,8 +143,6 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 };
 
 export default function Home() {
-	const uid = useRecoilValue(userState).uid;
-
 	return (
 		<>
 			<Head>

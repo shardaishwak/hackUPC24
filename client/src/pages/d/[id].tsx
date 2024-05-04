@@ -25,7 +25,7 @@ const DocumentRender: React.FC<{ documentId?: string; document?: Document }> = (
 	const setDocuments = useSetRecoilState(documentState);
 
 	const [currentVersion, setCurrentVersion] = React.useState(
-		(document?.versions.length || 1) - 1
+		(document?.versions?.length || 1) - 1
 	);
 
 	const callbackAsk = React.useCallback(

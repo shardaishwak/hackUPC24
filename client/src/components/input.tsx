@@ -12,10 +12,13 @@ import {
 import colors from "../../colors";
 import Image from "next/image";
 import { useState } from "react";
+import { useLanguage } from "@/i18n";
 
 const Input: React.FC<{ onClick: (value: string) => void }> = (props) => {
 	const { onClick } = props;
 	const [inputValue, setInputValue] = useState("");
+
+	const text: any = useLanguage(["write_a_prompt"]);
 
 	const handleInputChange = (event) => {
 		const value = event.target.value;
@@ -39,7 +42,7 @@ const Input: React.FC<{ onClick: (value: string) => void }> = (props) => {
 					onChange={handleInputChange}
 					type="text"
 					id="inputfield"
-					placeholder="Write a Prompt"
+					placeholder={text.write_a_prompt}
 					contentEditable="true"
 				></InputField>
 				<PlaceholderStyle />
