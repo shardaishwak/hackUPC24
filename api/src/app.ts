@@ -49,7 +49,9 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 
 		let document: IDocument;
 		if (documentID) {
-			document = (await Document.findById(documentID)) as IDocument;
+			document = (await Document.findById(documentID).populate(
+				"versions"
+			)) as IDocument;
 			// create a new document if the document is not found
 			if (!document) {
 				document = await Document.create({
@@ -92,11 +94,17 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
             your code needs to be complete. Try to give it as many features as possible.
         `;
 
+		const messages = [{ role: "system", content: setup_prompt }];
+		// load previous version history and genreate a new version
+		document.versions.forEach((version) => {
+			messages.push({ role: "user", content: version.prompt });
+			messages.push({ role: "assistant", content: version.content });
+		});
+
+		messages.push({ role: "user", content: prompt });
+
 		const chatCompletion = await openai.chat.completions.create({
-			messages: [
-				{ role: "system", content: setup_prompt },
-				{ role: "user", content: prompt },
-			],
+			messages: messages as any,
 			// model: "gpt-4-turbo",
 			model: "gpt-3.5-turbo",
 		});
