@@ -1,26 +1,34 @@
 import styled from "styled-components";
 
 import colors from "../../colors";
-import Image from "next/image";
-import { Roboto_Flex } from "next/font/google";
 import Viewer from "./Viewer";
 import { bodyMobileTablet1 } from "../../typography";
+import React from "react";
+import Editor from "@/Editor";
 
-const Output: React.FC<{ version_id: string }> = (props) => {
+const Output: React.FC<{ version_id: string; code: string }> = (props) => {
+	const [showCode, setShowCode] = React.useState(false);
+
 	return (
 		<Container>
 			<TopButtons>
 				<ViewButtons>
-					<TwoButton>2d</TwoButton>
+					<TwoButton>2D</TwoButton>
 
-					<ThreeButton>3d</ThreeButton>
+					<ThreeButton>3D</ThreeButton>
 				</ViewButtons>
 
-				<ViewCode>View Code</ViewCode>
+				<ViewCode onClick={() => setShowCode(!showCode)}>View Code</ViewCode>
 			</TopButtons>
 
 			<MainDiv>
-				<Viewer versionId={props.version_id} />
+				{showCode ? (
+					<div style={{ overflow: "auto", width: "100%", height: "100%" }}>
+						<Editor code={props.code} />
+					</div>
+				) : (
+					<Viewer versionId={props.version_id} />
+				)}
 			</MainDiv>
 		</Container>
 	);
@@ -51,10 +59,6 @@ const ViewButtons = styled.div`
 	align-items: center;
 `;
 
-const TwoButton = styled.button``;
-
-const ThreeButton = styled.button``;
-
 const ViewCode = styled.button`
 	margin-right: 16px;
 	padding: 6px 12px;
@@ -68,6 +72,10 @@ const ViewCode = styled.button`
 		background-color: ${colors.blue300};
 	}
 `;
+
+const TwoButton = styled(ViewCode)``;
+
+const ThreeButton = styled(ViewCode)``;
 
 const MainDiv = styled.div`
 	display: flex;

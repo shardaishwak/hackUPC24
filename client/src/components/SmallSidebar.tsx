@@ -57,7 +57,7 @@ const Button = styled.button<{ active?: boolean }>`
 	${(props) =>
 		props.active &&
 		`
-        background: ${colors.facebook_gradient};
+        background: ${colors.black};
         color: white
     `}
 `;

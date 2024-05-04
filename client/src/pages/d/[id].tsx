@@ -53,7 +53,10 @@ const DocumentRender: React.FC<{ documentId?: string; document?: Document }> = (
 					<Prompts list={document?.versions || []} />
 					<Input onClick={callbackAsk} />
 				</Container>
-				<Output version_id={document?.versions[currentVersion]?._id} />
+				<Output
+					code={document?.versions[currentVersion].content}
+					version_id={document?.versions[currentVersion]?._id}
+				/>
 				<SmallSidebar
 					active_version={currentVersion}
 					versions_count={document?.versions?.length || 1}

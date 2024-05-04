@@ -197,7 +197,7 @@ const Tag = styled.p`
 	margin-bottom: 8px;
 `;
 
-const CustomLink = styled.a<{ active?: boolean }>`
+const CustomLink = styled.p<{ active?: boolean }>`
 	${bodyMobileTablet1}
 	text-decoration: none;
 	${limitLines(1)}
