@@ -59,7 +59,7 @@ export const Auth = (props) => {
 		return (
 			<LoadingContainer className={inter.className}>
 				<h1>Framer Ai</h1>
-				<p>{text.loading}...</p>
+				<p>{text.loading}</p>
 			</LoadingContainer>
 		);
 	}
@@ -136,4 +136,6 @@ const MessagePopupContainer = styled.div`
 
 	${bodyMobileTablet2}
 	padding: 12px;
+
+	z-index: 999;
 `;

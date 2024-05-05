@@ -66,10 +66,15 @@ export const userState = atom<UserState>({
 	},
 });
 
-export const generalState = atom({
+export const generalState = atom<{
+	locale: string;
+	message: string;
+	dimensions: [number, number];
+}>({
 	key: "generalState",
 	default: {
 		locale: "en",
 		message: "",
+		dimensions: [300, 400],
 	},
 });

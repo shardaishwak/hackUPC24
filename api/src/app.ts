@@ -40,7 +40,7 @@ app.post("/user", async (req: Request, res: Response, next: NextFunction) => {
 
 app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		let { prompt, engine = "2D", uid, documentID } = req.body;
+		let { prompt, engine = "2D", uid, documentID, dimensions } = req.body;
 		if (!prompt) {
 			throw new ErrorWithStatus("Prompt is required", 400);
 		}
@@ -109,15 +109,20 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 			
         `;
 
-		const messages = [{ role: "system", content: setup_prompt }];
+		const messages = [{ role: "assistant", content: setup_prompt }];
 		// load previous version history and genreate a new version
 		// document.versions.forEach((version) => {
 		// 	messages.push({ role: "user", content: version.prompt });
 		// 	messages.push({ role: "assistant", content: version.content });
 		// });
 
-		//load the last version
+		//load the first and last version
 		if (document.versions.length > 0) {
+			if (document.versions_count > 1) {
+				const firstVersion = document.versions[0];
+				messages.push({ role: "user", content: firstVersion.prompt });
+				messages.push({ role: "assistant", content: firstVersion.content });
+			}
 			const lastVersion = document.versions[document.versions.length - 1];
 			messages.push({ role: "user", content: lastVersion.prompt });
 			messages.push({ role: "assistant", content: lastVersion.content });
@@ -128,7 +133,10 @@ app.post("/ask", async (req: Request, res: Response, next: NextFunction) => {
 		const chatCompletion = await openai.chat.completions.create({
 			messages: messages as any,
 			// model: "gpt-4-turbo",
-			model: "gpt-3.5-turbo",
+			model: "gpt-4-turbo",
+			temperature: 0.7,
+			frequency_penalty: 0,
+			presence_penalty: 0.6,
 		});
 
 		if (

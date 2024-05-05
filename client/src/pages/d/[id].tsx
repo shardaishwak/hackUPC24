@@ -20,7 +20,7 @@ const DocumentRender: React.FC<{ documentId?: string; document?: Document }> = (
 ) => {
 	const { documentId, document } = props;
 	const uid = useRecoilValue(userState).uid;
-	const setUser = useSetRecoilState(userState);
+	const general = useRecoilValue(generalState);
 
 	const setDocuments = useSetRecoilState(documentState);
 	const setGeneral = useSetRecoilState(generalState);
@@ -29,37 +29,53 @@ const DocumentRender: React.FC<{ documentId?: string; document?: Document }> = (
 		(document?.versions?.length || 1) - 1
 	);
 
+	const [loading, setLoading] = React.useState(false);
+
 	const callbackAsk = React.useCallback(
 		async (value, _type) => {
-			if (!uid) return;
-			const [type, result] = await ask(uid, value, _type, documentId);
+			try {
+				if (!uid) return;
+				setLoading(true);
+				const [type, result] = await ask(
+					uid,
+					value,
+					_type,
+					general.dimensions,
+					documentId
+				);
 
-			if (type === "message") {
-				// do something with ask_data.message
-				setGeneral((prev) => ({
-					...prev,
-					message: result.message,
-				}));
-			} else if (type === "error") {
-				// do something with ask_data.error
-				setGeneral((prev) => ({
-					...prev,
-					message: result.error,
-				}));
-			} else {
-				const documentWithVersions = await getDocument(documentId);
-				// it is in format [key]: value
-				setDocuments((prev) => {
-					return {
-						documents: {
-							...prev.documents,
-							[documentId]: documentWithVersions,
-						},
-					};
-				});
+				if (type === "message") {
+					// do something with ask_data.message
+					// update the document with new text from user and agent error
+					setGeneral((prev) => ({
+						...prev,
+						message: result.message,
+					}));
+				} else if (type === "error") {
+					// do something with ask_data.error
+					setGeneral((prev) => ({
+						...prev,
+						message: result.error,
+					}));
+				} else {
+					const documentWithVersions = await getDocument(documentId);
+					// it is in format [key]: value
+					setDocuments((prev) => {
+						return {
+							documents: {
+								...prev.documents,
+								[documentId]: documentWithVersions,
+							},
+						};
+					});
+					setCurrentVersion(documentWithVersions.versions.length - 1);
+				}
+				setLoading(false);
+			} catch (err) {
+				setLoading(false);
 			}
 		},
-		[uid, documentId]
+		[uid, documentId, general.dimensions]
 	);
 	return (
 		<>
@@ -67,10 +83,10 @@ const DocumentRender: React.FC<{ documentId?: string; document?: Document }> = (
 				<Sidebar active_id={documentId} />
 				<Container>
 					<Prompts list={document?.versions || []} />
-					<Input hideType onClick={callbackAsk} />
+					<Input hideType onClick={callbackAsk} loading={loading} />
 				</Container>
 				<Output
-					code={document?.versions[currentVersion].content}
+					code={document?.versions[currentVersion]?.content}
 					version_id={document?.versions[currentVersion]?._id}
 					type={document?.type || "2D"}
 				/>

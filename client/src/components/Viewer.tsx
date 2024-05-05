@@ -2,6 +2,7 @@ import { versionState } from "@/recoil";
 import React from "react";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
+import { IoReload } from "react-icons/io5";
 
 const fetchVersion = async (versionId: string) => {
 	try {
@@ -21,6 +22,11 @@ const Viewer: React.FC<Props> = (props) => {
 	const { versionId } = props;
 	const [versionUrl, setVersionUrl] = React.useState<string>("");
 
+	const callbackReloadFrame = () => {
+		if (document.getElementById("frame")?.src)
+			document.getElementById("frame").src =
+				document.getElementById("frame").src;
+	};
 	React.useEffect(() => {
 		(async () => {
 			const htmlContent = await fetchVersion(versionId);
@@ -43,7 +49,10 @@ const Viewer: React.FC<Props> = (props) => {
 
 	return (
 		<Container>
-			<iframe src={versionUrl} width="100%" height="100%"></iframe>
+			<iframe id="frame" src={versionUrl} width="100%" height="100%"></iframe>
+			<ReloadButton onClick={callbackReloadFrame}>
+				<IoReload size={24} />
+			</ReloadButton>
 		</Container>
 	);
 };
@@ -51,10 +60,20 @@ const Viewer: React.FC<Props> = (props) => {
 const Container = styled.div`
 	height: 100%;
 	width: 100%;
+	position: relative;
 
 	iframe {
 		border: none;
 	}
+`;
+
+const ReloadButton = styled.button`
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
 `;
 
 export default Viewer;

@@ -7,7 +7,7 @@ import styled from "styled-components";
 import Output from "@/components/output";
 import Viewer from "@/components/Viewer";
 import SmallSidebar from "@/components/SmallSidebar";
-import React from "react";
+import React, { use } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { generalState, userState } from "@/recoil";
 import { useRouter } from "next/router";
@@ -15,11 +15,15 @@ import { ask, getUser } from "@/recoil/functions";
 import { Auth } from "./_app";
 import Image from "next/image";
 import {
+	bodyDesktop1,
+	bodyDesktop3,
 	bodyMobileTablet1,
 	bodyMobileTablet2,
+	bodyMobileTablet3,
 	heading0,
 	heading1,
 	heading9,
+	limitLines,
 } from "../../typography";
 import colors from "../../colors";
 import { useLanguage } from "@/i18n";
@@ -59,24 +63,67 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 		"prompt_8",
 		"prompt_9",
 		"prompt_10",
+		"prompt_1_title",
+		"prompt_2_title",
+		"prompt_3_title",
+		"prompt_4_title",
+		"prompt_5_title",
+		"prompt_6_title",
+		"prompt_7_title",
+		"prompt_8_title",
+		"prompt_9_title",
+		"prompt_10_title",
 		"paragraph",
 	]);
 
 	const prompts = [
-		text.prompt_1,
-		text.prompt_2,
-		text.prompt_3,
-		text.prompt_4,
-		text.prompt_5,
-		text.prompt_6,
-		text.prompt_7,
-		text.prompt_8,
-		text.prompt_9,
-		text.prompt_10,
+		{
+			title: text.prompt_1_title,
+			content: text.prompt_1,
+		},
+		{
+			title: text.prompt_2_title,
+			content: text.prompt_2,
+		},
+		{
+			title: text.prompt_3_title,
+			content: text.prompt_3,
+		},
+		{
+			title: text.prompt_4_title,
+			content: text.prompt_4,
+		},
+		{
+			title: text.prompt_5_title,
+			content: text.prompt_5,
+		},
+		{
+			title: text.prompt_6_title,
+			content: text.prompt_6,
+		},
+		{
+			title: text.prompt_7_title,
+			content: text.prompt_7,
+		},
+		{
+			title: text.prompt_8_title,
+			content: text.prompt_8,
+		},
+		{
+			title: text.prompt_9_title,
+			content: text.prompt_9,
+		},
+		{
+			title: text.prompt_10_title,
+			content: text.prompt_10,
+		},
 	];
 
-	const [selectedPrompts, setSelectedPrompts] = React.useState<string[]>([]);
+	const [selectedPrompts, setSelectedPrompts] = React.useState<
+		{ title: string; content: string }[]
+	>([]);
 	const setGeneral = useSetRecoilState(generalState);
+	const general = useRecoilValue(generalState);
 
 	React.useEffect(() => {
 		setSelectedPrompts(selectFourItems(prompts));
@@ -87,7 +134,13 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 			if (!uid) return;
 			setSelected(value);
 			setTemporaryPrompt(value);
-			const [type, ask_data] = await ask(uid, value, _type, documentId);
+			const [type, ask_data] = await ask(
+				uid,
+				value,
+				_type,
+				general.dimensions,
+				documentId
+			);
 
 			if (type === "message") {
 				// do something with ask_data.message
@@ -109,7 +162,7 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 			setTemporaryPrompt(null);
 			setSelected(null);
 		},
-		[uid, documentId]
+		[uid, documentId, general.dimensions]
 	);
 	return (
 		<>
@@ -145,8 +198,12 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 							<P>{text.paragraph}</P>
 							<Suggestions>
 								{selectedPrompts.map((prompt) => (
-									<Suggestion key={prompt} onClick={() => callbackAsk(prompt)}>
-										{prompt}
+									<Suggestion
+										key={prompt}
+										onClick={() => callbackAsk(prompt.content, "2D")}
+									>
+										<h3>{prompt.title}</h3>
+										<p>{prompt.content}</p>
 									</Suggestion>
 								))}
 							</Suggestions>
@@ -226,6 +283,20 @@ const Suggestion = styled.div`
 	border: 2px solid ${colors.blue300};
 	border-radius: 16px;
 	cursor: pointer;
-	width: 40%;
-	opacity: 0.8;
+	width: 43%;
+	h3 {
+		${bodyDesktop3}
+		font-weight: 600;
+	}
+	p {
+		${bodyMobileTablet2}
+		opacity: 0.65;
+		margin-top: 4px;
+		${limitLines(2)}
+		line-height: 21px;
+	}
+
+	&:hover {
+		background: ${colors.blue100};
+	}
 `;

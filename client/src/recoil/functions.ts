@@ -10,6 +10,7 @@ export const ask = async (
 	uid: string,
 	prompt: string,
 	_type: string,
+	dimensions: [number, number],
 	documentId?: string
 ) => {
 	const response = await fetch("http://localhost:5001/ask", {
@@ -20,6 +21,7 @@ export const ask = async (
 		body: JSON.stringify({
 			prompt,
 			uid,
+			// dimensions,
 			engine: _type,
 			...(documentId ? { documentID: documentId } : {}),
 		}),

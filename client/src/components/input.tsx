@@ -11,17 +11,20 @@ import {
 } from "../../typography";
 import colors from "../../colors";
 import Image from "next/image";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useLanguage } from "@/i18n";
 import { IoMdReturnRight } from "react-icons/io";
 
 const Input: React.FC<{
-	onClick: (value: string, type: string, hideType: boolean) => void;
+	onClick: (value: string, type: string) => void;
 	hideType?: boolean;
+	loading?: boolean;
 }> = (props) => {
 	const { onClick } = props;
 	const [inputValue, setInputValue] = useState("");
 	const [type, setType] = useState("2D");
+
+	const ref = React.useRef(null);
 
 	const text: any = useLanguage(["write_a_prompt"]);
 
@@ -46,11 +49,11 @@ const Input: React.FC<{
 				)}
 				<InputField
 					onInput={handleInputChange}
-					type="text"
 					id="inputfield"
 					placeholder={text.write_a_prompt}
 					contentEditable="true"
 					style={{ marginLeft: !props.hideType ? 4 : 0 }}
+					ref={ref}
 				></InputField>
 				<PlaceholderStyle />
 
@@ -58,9 +61,14 @@ const Input: React.FC<{
 					onClick={() => {
 						onClick(inputValue, type);
 						setInputValue("");
+						if (ref?.current?.textContent) ref.current.textContent = "";
 					}}
 				>
-					<IoMdReturnRight color="white" size={16} />
+					{props.loading ? (
+						"Loading..."
+					) : (
+						<IoMdReturnRight color="white" size={16} />
+					)}
 				</Button>
 			</Container2>
 		</Container>
@@ -160,7 +168,7 @@ const PlaceholderStyle = styled.img`
 `;
 
 const Button = styled.div`
-	width: 48px;
+	padding: 0 12px;
 	height: 32px;
 	border-radius: 999px;
 	flex-shrink: 0;

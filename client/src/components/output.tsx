@@ -3,15 +3,33 @@ import styled from "styled-components";
 import colors from "../../colors";
 import Viewer from "./Viewer";
 import { bodyMobileTablet1 } from "../../typography";
-import React from "react";
+import React, { useRef } from "react";
 import Editor from "@/Editor";
 import { useLanguage } from "@/i18n";
+import { useSetRecoilState } from "recoil";
+import { generalState } from "@/recoil";
 
 const Output: React.FC<{ version_id: string; code: string; type: string }> = (
 	props
 ) => {
 	const [showCode, setShowCode] = React.useState(false);
 	const text: any = useLanguage(["view_code"]);
+
+	const setGeneral = useSetRecoilState(generalState);
+
+	const ref = useRef<HTMLDivElement>(null);
+
+	React.useEffect(() => {
+		const width = ref?.current?.clientWidth;
+		const height = ref?.current?.clientHeight;
+
+		if (width && height) {
+			setGeneral((prev) => ({
+				...prev,
+				dimensions: [width, height],
+			}));
+		}
+	}, []);
 
 	return (
 		<Container>
@@ -27,7 +45,7 @@ const Output: React.FC<{ version_id: string; code: string; type: string }> = (
 				</ViewCode>
 			</TopButtons>
 
-			<MainDiv>
+			<MainDiv ref={ref}>
 				{showCode ? (
 					<div style={{ overflow: "auto", width: "100%", height: "100%" }}>
 						<Editor code={props.code} />
