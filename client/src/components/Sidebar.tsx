@@ -84,7 +84,24 @@ const Sidebar = (props) => {
 	return (
 		<Container>
 			<div>
-				<Title>Framer AI</Title>
+				<div
+					style={{
+						display: "flex",
+						alignItems: "center",
+						gap: 12,
+						marginLeft: 15,
+						marginBottom: 4,
+						padding: 16,
+					}}
+				>
+					<Image
+						src={"/cloud-transparent.png"}
+						width={40}
+						height={35}
+						alt="Cloud"
+					/>
+					<Title>Framer AI</Title>
+				</div>
 				{/** Add button */}
 				<Link href={"/"} style={{ textDecoration: "none" }}>
 					<CustomLink
@@ -95,6 +112,8 @@ const Sidebar = (props) => {
 							background: colors.blue200,
 							marginBottom: 24,
 							fontWeight: 600,
+							textAlign: "center",
+							paddingLeft: 0,
 						}}
 						active={false}
 					>
@@ -243,11 +262,13 @@ const Container = styled.div`
 	background: ${colors.blue100};
 	border-top-right-radius: 16px;
 	border-bottom-right-radius: 16px;
+	user-select: none;
 `;
 
 const Title = styled.h1`
 	${heading1}
 	padding: 16px;
+	padding-left: 0;
 `;
 
 const Lister = styled.div`
@@ -285,6 +306,7 @@ const CustomLink = styled.p<{ active?: boolean }>`
 	border-bottom-right-radius: 16px;
 	color: ${colors.black};
 	text-decoration: none;
+	padding-right: 8px;
 
 	${(props) =>
 		props.active &&

@@ -26,6 +26,10 @@ const openai = new OpenAI({
 	apiKey: process.env.OPENAI_KEY, // This is the default and can be omitted
 });
 
+app.get("/", (_req: Request, res: Response) => {
+	res.send("Hello World");
+});
+
 app.post("/user", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { uid } = req.body;

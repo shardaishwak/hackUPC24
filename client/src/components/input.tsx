@@ -121,6 +121,8 @@ const Container = styled.div`
 	width: 100%;
 	justify-content: flex-end;
 	align-items: flex-end;
+	padding: 12px;
+	box-sizing: border-box;
 `;
 
 const Container2 = styled.div`
