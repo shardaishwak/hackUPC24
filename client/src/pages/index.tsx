@@ -119,14 +119,16 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 		},
 	];
 
-	const [selectedPrompts, setSelectedPrompts] = React.useState<
-		{ title: string; content: string }[]
-	>([]);
+	const randomNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+	const [selectedPrompts, setSelectedPrompts] = React.useState<number[] | any>(
+		[]
+	);
 	const setGeneral = useSetRecoilState(generalState);
 	const general = useRecoilValue(generalState);
 
 	React.useEffect(() => {
-		setSelectedPrompts(selectFourItems(prompts));
+		setSelectedPrompts(selectFourItems(randomNumbers));
 	}, []);
 
 	const callbackAsk = React.useCallback(
@@ -197,13 +199,13 @@ const DocumentRender: React.FC<{ documentId?: string }> = (props) => {
 							<Title>Framer AI</Title>
 							<P>{text.paragraph}</P>
 							<Suggestions>
-								{selectedPrompts.map((prompt) => (
+								{selectedPrompts.map((ind) => (
 									<Suggestion
-										key={prompt}
-										onClick={() => callbackAsk(prompt.content, "2D")}
+										key={prompts[ind - 1].title}
+										onClick={() => callbackAsk(prompts[ind - 1].content, "2D")}
 									>
-										<h3>{prompt.title}</h3>
-										<p>{prompt.content}</p>
+										<h3>{prompts[ind - 1].title}</h3>
+										<p>{prompts[ind - 1].content}</p>
 									</Suggestion>
 								))}
 							</Suggestions>

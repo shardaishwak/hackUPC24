@@ -8,11 +8,12 @@ import {
 } from "../../typography";
 import colors from "../../colors";
 import Image from "next/image";
-import { useRecoilValue } from "recoil";
-import { Document, userState } from "@/recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { Document, generalState, userState } from "@/recoil";
 import { useAuth0 } from "@auth0/auth0-react";
 import Link from "next/link";
 import { useLanguage } from "@/i18n";
+import React from "react";
 
 const array_partitioning = (documents) => {
 	// Get today's date
@@ -153,6 +154,8 @@ const Sidebar = (props) => {
 				</Lister>
 			</div>
 			<UserContainer>
+				<LanguageSelector />
+
 				<UserInfo>
 					<Image
 						src={user?.picture || "/women.jpg"}
@@ -168,6 +171,67 @@ const Sidebar = (props) => {
 				</UserInfo>
 			</UserContainer>
 		</Container>
+	);
+};
+
+const LanguageSelectorWrapper = styled.div`
+	padding: 4px;
+	border-radius: 6px;
+	background: transparent;
+	border: 2px solid ${colors.blue300};
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin: 0 16px;
+	margin-bottom: 24px;
+`;
+
+const LanguageSelectorButton = styled.button<{ active?: boolean }>`
+	background: transparent;
+	border: none;
+	width: 100%;
+	text-transform: uppercase;
+
+	padding: 4px 0;
+	border-radius: 4px;
+
+	cursor: pointer;
+
+	${(props) =>
+		props.active &&
+		`
+		background: ${colors.black};color: ${colors.white};
+	`}
+`;
+
+const LanguageSelector = () => {
+	const [isOpen, setIsOpen] = React.useState(false);
+	const [general, setGeneral] = useRecoilState(generalState);
+	const selectedLanguage = general.locale;
+
+	const languages = ["en", "es", "ca", "fr", "sw"];
+
+	const handleLanguageChange = (language) => {
+		setGeneral({
+			...general,
+			locale: language === "sw" ? "shyriiwook" : language,
+		});
+		setIsOpen(false);
+		// You can implement logic here to handle language change, such as updating the UI language
+	};
+
+	return (
+		<LanguageSelectorWrapper>
+			{languages.map((language) => (
+				<LanguageSelectorButton
+					key={language}
+					active={selectedLanguage === language}
+					onClick={() => handleLanguageChange(language)}
+				>
+					{language}
+				</LanguageSelectorButton>
+			))}
+		</LanguageSelectorWrapper>
 	);
 };
 
@@ -235,9 +299,6 @@ const CustomLink = styled.p<{ active?: boolean }>`
 `;
 
 const UserContainer = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
 	margin-bottom: 16px;
 `;
 
