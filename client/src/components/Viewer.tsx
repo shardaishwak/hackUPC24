@@ -6,7 +6,9 @@ import { IoReload } from "react-icons/io5";
 
 const fetchVersion = async (versionId: string) => {
 	try {
-		const res = await fetch(`http://localhost:5001/version/${versionId}`);
+		const res = await fetch(
+			`${process.env.NEXT_PUBLIC_API_URL}/version/${versionId}`
+		);
 		const data = await res.text();
 		return data;
 	} catch (err) {

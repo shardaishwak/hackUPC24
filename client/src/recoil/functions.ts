@@ -1,5 +1,5 @@
 export const getUser = async (uid: string) => {
-	const res = await fetch("http://localhost:5001/user/" + uid, {
+	const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/` + uid, {
 		method: "GET",
 	});
 	const data = await res.json();
@@ -13,7 +13,7 @@ export const ask = async (
 	dimensions: [number, number],
 	documentId?: string
 ) => {
-	const response = await fetch("http://localhost:5001/ask", {
+	const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ask`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -39,9 +39,12 @@ export const ask = async (
 };
 
 export const getDocument = async (documentId: string) => {
-	const res = await fetch("http://localhost:5001/document/" + documentId, {
-		method: "GET",
-	});
+	const res = await fetch(
+		`${process.env.NEXT_PUBLIC_API_URL}/document/` + documentId,
+		{
+			method: "GET",
+		}
+	);
 	const data = await res.json();
 	return data;
 };
